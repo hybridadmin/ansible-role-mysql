@@ -1,2 +1,8 @@
 ---
-# tasks file for ansible-role-test1
+# tasks file for ansible-role-mysql
+
+- include: repo-setup.yml
+
+- include: install.yml
+
+- include: secure-mysql.yml

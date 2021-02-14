@@ -1,2 +1,8 @@
 ---
-# handlers file for ansible-role-test1
+# handlers file for ansible-role-mysql
+
+- name: start mysql service
+  systemd:
+    state: started
+    name: "{{ mysql_service }}"
+    enabled: yes

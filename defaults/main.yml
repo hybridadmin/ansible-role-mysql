@@ -1,2 +1,6 @@
 ---
-# defaults file for ansible-role-test1
+# defaults file for ansible-role-mysql
+
+mariadb_version: 10.3
+
+mariadb_root_password: ''

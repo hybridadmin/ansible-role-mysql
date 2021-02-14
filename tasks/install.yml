@@ -1,0 +1,10 @@
+---
+
+- name: install mysql packages
+  action: >
+    {{ ansible_pkg_mgr }} name={{ mysql_package_list }} state=present update_cache=yes
+  notify:
+    - start mysql service
+
+- name: Flush handlers
+  meta: flush_handlers

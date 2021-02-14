@@ -1,6 +1,6 @@
 galaxy_info:
   author: your name
-  role_name: ROLE-NAME
+  role_name: mariadb
   description: your role description
   company: your company (optional)
   license: license (Apache-2.0)

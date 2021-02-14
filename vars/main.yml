@@ -1,2 +1,40 @@
 ---
-# vars file for ansible-role-test1
+# vars file for ansible-role-mysql
+
+_basic_system_packages:
+  default:
+    - gnupg2
+  Debian:
+    - software-properties-common
+  RedHat:
+
+#basic_system_packages: "{{ _basic_system_packages['default'] + _basic_system_packages[ansible_os_family] }}"
+basic_system_packages: "{% if 'RedHat' in ansible_os_family %}{{ _basic_system_packages['default'] }}{% else %}{{ _basic_system_packages['default'] + _basic_system_packages[ansible_os_family] }}{% endif %}"
+
+_mariadb_packages:
+  Debian:
+    - mariadb-server
+    - mariadb-client
+    - mariadb-common
+  RedHat:
+    - MariaDB-server
+    - MariaDB-client
+    - MariaDB-shared
+    - MariaDB-common
+
+mysql_package_list: "{{ _mariadb_packages[ansible_os_family] }}"
+
+_mariadb_repo_file_mapping:
+  Debian:
+    - { source: "templates/sources.list.d/MariaDB.list.j2", dest: "/etc/apt/sources.list.d/MariaDB.list" }
+  RedHat:
+    - { source: "templates/yum.repos.d/MariaDB.repo.j2", dest: "/etc/yum.repos.d/MariaDB.repo" }
+
+mysql_repo_file_info: "{{ _mariadb_repo_file_mapping[ansible_os_family] }}"
+
+mysql_service: "mariadb"
+mysql_port: 3306
+
+config_templates:
+  - {src: "sysctl.d/99-sysctl.conf.j2", dest: "/etc/sysctl.d/99-sysctl.conf", mode: "0644"}
+  - {src: "limits.d/99-limits.conf.j2", dest: "/etc/security/limits.d/99-limits.conf", mode: "0644"}
