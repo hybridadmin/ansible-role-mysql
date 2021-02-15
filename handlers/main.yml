@@ -4,5 +4,5 @@
 - name: start mysql service
   systemd:
     state: started
-    name: "{{ mysql_service }}"
+    name: "{{ mysql_service_daemon }}"
     enabled: yes

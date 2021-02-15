@@ -1,6 +1,8 @@
 ---
-# defaults file for ansible-role-mysql
 
-mariadb_version: 10.3
+#install_mariadb: true
+#mysql_version: 10.3
+install_mariadb: false
+mysql_version: 8.0
 
-mariadb_root_password: ''
+mysql_root_password: ''

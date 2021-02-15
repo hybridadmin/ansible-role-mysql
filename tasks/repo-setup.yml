@@ -14,16 +14,23 @@
 
 - name: apt-key - debian gpg key
   apt_key:
-    url: https://mariadb.org/mariadb_release_signing_key.asc
-    id: 177F4010FE56CA3336300305F1656F24C74CD1D8
-    state: present
+    keyserver: "{{ item.server }}"
+    id: "{{ item.fingerprint }}"
   when: ansible_os_family == 'Debian'
+  with_items: "{{ apt_gpg_key_info }}"
 
 - name: rpm_key - redhat gpg key
-  rpm_key:
-    state: present
-    key: https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+  shell: |
+    set -o pipefail
+    curl -fsSL {{ item.url }} -o {{ item.dest }}
+    rpm --import {{ item.dest }}
+  args:
+      executable: /bin/bash
+  become: true
+  changed_when: false
   when: ansible_os_family == 'RedHat'
+  with_items:
+    - "{{ rpm_gpg_key_info }}"
 
 - name: update package cache
   action: >

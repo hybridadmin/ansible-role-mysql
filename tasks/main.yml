@@ -6,3 +6,5 @@
 - include: install.yml
 
 - include: secure-mysql.yml
+
+- include: configure.yml

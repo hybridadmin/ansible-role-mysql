@@ -1,8 +1,0 @@
-[mariadb]
-name = MariaDB-{{ mariadb_version }}
-baseurl=http://yum.mariadb.org/{{ mariadb_version }}/{{ ansible_distribution | lower }}{{ ansible_distribution_major_version }}-amd64
-{% if 'dnf' in ansible_pkg_mgr %}
-module_hotfixes=1
-{% endif %}
-gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
-gpgcheck=1

@@ -10,4 +10,4 @@ innodb_doublewrite=1
 innodb_flush_log_at_trx_commit=0
 wsrep_sst_method=mariabackup
 wsrep_sst_auth=cluster_backup_user:P455w0rd
-wsrep_node_address=192.168.0.241 # change this
+wsrep_node_address={{ ansible_default_ipv4.address }} # change this

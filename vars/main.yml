@@ -1,38 +1,85 @@
 ---
-# vars file for ansible-role-mysql
 
 _basic_system_packages:
   default:
     - gnupg2
+    - curl
   Debian:
     - software-properties-common
+    - procps
   RedHat:
+    - procps-ng
 
-#basic_system_packages: "{{ _basic_system_packages['default'] + _basic_system_packages[ansible_os_family] }}"
-basic_system_packages: "{% if 'RedHat' in ansible_os_family %}{{ _basic_system_packages['default'] }}{% else %}{{ _basic_system_packages['default'] + _basic_system_packages[ansible_os_family] }}{% endif %}"
+basic_system_packages: "{{ _basic_system_packages['default'] + _basic_system_packages[ansible_os_family] }}"
+#basic_system_packages: "{% if 'RedHat' in ansible_os_family %}{{ _basic_system_packages['default'] }}{% else %}{{ _basic_system_packages['default'] + _basic_system_packages[ansible_os_family] }}{% endif %}"
 
-_mariadb_packages:
+# mysql packages
+_mysql_package_list:
   Debian:
-    - mariadb-server
-    - mariadb-client
-    - mariadb-common
+    mariadb:
+      - mariadb-server
+      - mariadb-client
+      - mariadb-common
+    mysql:
+      - mysql-server
   RedHat:
-    - MariaDB-server
-    - MariaDB-client
-    - MariaDB-shared
-    - MariaDB-common
+    mariadb:
+      - MariaDB-server
+      - MariaDB-client
+      - MariaDB-shared
+      - MariaDB-common
+    mysql:
+      - mysql-community-server
 
-mysql_package_list: "{{ _mariadb_packages[ansible_os_family] }}"
+mysql_package_list: "{% if install_mariadb | bool %}{{ _mysql_package_list[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_package_list[ansible_os_family]['mysql'] }}{% endif %}"
 
-_mariadb_repo_file_mapping:
+# mysql repo
+_mysql_repo_file_mapping:
   Debian:
-    - { source: "templates/sources.list.d/MariaDB.list.j2", dest: "/etc/apt/sources.list.d/MariaDB.list" }
+    mariadb:
+      - { source: "templates/sources.list.d/mariadb/MariaDB.list.j2", dest: "/etc/apt/sources.list.d/MariaDB.list" }
+    mysql:
+      - { source: "templates/sources.list.d/mysql/mysql.list.j2", dest: "/etc/apt/sources.list.d/mysql.list" }
   RedHat:
-    - { source: "templates/yum.repos.d/MariaDB.repo.j2", dest: "/etc/yum.repos.d/MariaDB.repo" }
+    mariadb:
+      - { source: "templates/yum.repos.d/mariadb/MariaDB.repo.j2", dest: "/etc/yum.repos.d/MariaDB.repo" }
+    mysql:
+      - { source: "templates/yum.repos.d/mysql/mysql-community.repo.j2", dest: "/etc/yum.repos.d/mysql-community.repo" }
 
-mysql_repo_file_info: "{{ _mariadb_repo_file_mapping[ansible_os_family] }}"
+mysql_repo_file_info: "{% if install_mariadb | bool %}{{ _mysql_repo_file_mapping[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_repo_file_mapping[ansible_os_family]['mysql'] }}{% endif %}"
 
-mysql_service: "mariadb"
+_rpm_gpg_key_info:
+  mariadb:
+    - { url: "https://yum.mariadb.org/RPM-GPG-KEY-MariaDB", dest: "/tmp/RPM-GPG-KEY-MariaDB" }
+  mysql:
+    - { url: "https://repo.mysql.com/RPM-GPG-KEY-mysql", dest: "/tmp/RPM-GPG-KEY-mysql"}
+
+rpm_gpg_key_info: "{% if install_mariadb | bool %}{{ _rpm_gpg_key_info['mariadb'] }}{% else %}{{ _rpm_gpg_key_info['mysql'] }}{% endif %}"
+
+# https://dev.mysql.com/doc/refman/8.0/en/checking-gpg-signature.html
+_apt_gpg_key_info:
+  mariadb:
+    - { server: "keyserver.ubuntu.com", fingerprint: "177F4010FE56CA3336300305F1656F24C74CD1D8" }
+  mysql:
+    - { server: "keys.gnupg.net", fingerprint: "A4A9406876FCBD3C456770C88C718D3B5072E1F5" }
+
+apt_gpg_key_info: "{% if install_mariadb | bool %}{{ _apt_gpg_key_info['mariadb'] }}{% else %}{{ _apt_gpg_key_info['mysql'] }}{% endif %}"
+
+# mysql service
+_mysql_service_daemon:
+  Debian:
+    mariadb:
+      name: mariadb
+    mysql:
+      name: mysql
+  RedHat:
+    mariadb:
+      name: mariadb
+    mysql:
+      name: mysqld
+
+mysql_service_daemon: "{% if install_mariadb | bool %}{{ _mysql_service_daemon[ansible_os_family]['mariadb']['name'] }}{% else %}{{ _mysql_service_daemon[ansible_os_family]['mysql']['name'] }}{% endif %}"
+
 mysql_port: 3306
 
 config_templates:
