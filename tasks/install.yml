@@ -4,6 +4,8 @@
   action: >
     {{ ansible_pkg_mgr }} name={{ mysql_package_list }} state=present update_cache=yes
   notify:
+    - initialize mysql
+    - custom configuration
     - start mysql service
 
 - name: Flush handlers

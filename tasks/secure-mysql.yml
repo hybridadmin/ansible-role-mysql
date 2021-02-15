@@ -11,7 +11,7 @@
     - localhost
     - 127.0.0.1
     - ::1
-  when: mysql_root_passwd is defined
+  when: mysql_root_password|length > 0
 
 - name: Reload privilege tables
   shell: |
@@ -64,18 +64,18 @@
     - FLUSH PRIVILEGES
   changed_when: False
 
-- name: change mysql port
-  lineinfile:
-    path: "/etc/my.cnf.d/server.cnf"
-    regexp: '^port='
-    insertafter: '\[mariadb\]'
-    line: "port={{ mysql_port }}"
-  when: mysql_port|int != 3306
+#- name: change mysql port
+#  lineinfile:
+#    path: "/etc/my.cnf.d/server.cnf"
+#    regexp: '^port='
+#    insertafter: '\[mariadb\]'
+#    line: "port={{ mysql_server_settings.port }}"
+#  when: mysql_server_settings.port|int != 3306
 
-- name: selinux - Allow mysql to listen on tcp port {{ mysql_port }}
+- name: selinux - Allow mysql to listen on tcp port {{ mysql_server_settings.port }}
   seport:
-    ports: "{{ mysql_port }}"
+    ports: "{{ mysql_server_settings.port }}"
     proto: tcp
     setype: mysqld_port_t
     state: present
-  when: ansible_os_family == 'RedHat' and (mysql_port|int != 3306 and ansible_selinux.status == 'enabled')
+  when: ansible_os_family == 'RedHat' and (mysql_server_settings.port|int != 3306 and ansible_selinux.status == 'enabled')

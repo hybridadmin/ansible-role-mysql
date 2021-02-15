@@ -1,6 +1,23 @@
 ---
 # handlers file for ansible-role-mysql
 
+- name: initialize mysql
+  shell: |
+    set -o pipefail
+    mysqld --initialize-insecure --user=mysql --basedir=/usr --datadir=/var/lib/mysql
+  args:
+      executable: /bin/bash
+  become: true
+  changed_when: false
+  when: ansible_os_family == 'RedHat' and mysql_version is version('8.0', '>=')
+  #ansible_distribution == 'CentOS' and ansible_distribution_major_version | int <= 7 and mysql_version is version('8.0', '>=')
+
+- name: custom configuration
+  template:
+    src: "mysql/server/99-mysql-custom.cnf"
+    dest: "{{ mysql_conf_file }}"
+    mode: 0644
+
 - name: start mysql service
   systemd:
     state: started

@@ -11,9 +11,8 @@ _basic_system_packages:
     - procps-ng
 
 basic_system_packages: "{{ _basic_system_packages['default'] + _basic_system_packages[ansible_os_family] }}"
-#basic_system_packages: "{% if 'RedHat' in ansible_os_family %}{{ _basic_system_packages['default'] }}{% else %}{{ _basic_system_packages['default'] + _basic_system_packages[ansible_os_family] }}{% endif %}"
 
-# mysql packages
+# package configuration
 _mysql_package_list:
   Debian:
     mariadb:
@@ -33,18 +32,20 @@ _mysql_package_list:
 
 mysql_package_list: "{% if install_mariadb | bool %}{{ _mysql_package_list[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_package_list[ansible_os_family]['mysql'] }}{% endif %}"
 
-# mysql repo
+mysql_conf_file: "{% if install_mariadb | bool %}/etc/mariadb/conf.d/99-mysql-custom.cnf{% else %}/etc/mysql/conf.d/99-mysql-custom.cnf{% endif %}"
+
+# repo configuration
 _mysql_repo_file_mapping:
   Debian:
     mariadb:
-      - { source: "templates/sources.list.d/mariadb/MariaDB.list.j2", dest: "/etc/apt/sources.list.d/MariaDB.list" }
+      - { source: "sources.list.d/mariadb/MariaDB.list.j2", dest: "/etc/apt/sources.list.d/MariaDB.list" }
     mysql:
-      - { source: "templates/sources.list.d/mysql/mysql.list.j2", dest: "/etc/apt/sources.list.d/mysql.list" }
+      - { source: "sources.list.d/mysql/mysql.list.j2", dest: "/etc/apt/sources.list.d/mysql.list" }
   RedHat:
     mariadb:
-      - { source: "templates/yum.repos.d/mariadb/MariaDB.repo.j2", dest: "/etc/yum.repos.d/MariaDB.repo" }
+      - { source: "yum.repos.d/mariadb/MariaDB.repo.j2", dest: "/etc/yum.repos.d/MariaDB.repo" }
     mysql:
-      - { source: "templates/yum.repos.d/mysql/mysql-community.repo.j2", dest: "/etc/yum.repos.d/mysql-community.repo" }
+      - { source: "yum.repos.d/mysql/mysql-community.repo.j2", dest: "/etc/yum.repos.d/mysql-community.repo" }
 
 mysql_repo_file_info: "{% if install_mariadb | bool %}{{ _mysql_repo_file_mapping[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_repo_file_mapping[ansible_os_family]['mysql'] }}{% endif %}"
 
@@ -65,7 +66,7 @@ _apt_gpg_key_info:
 
 apt_gpg_key_info: "{% if install_mariadb | bool %}{{ _apt_gpg_key_info['mariadb'] }}{% else %}{{ _apt_gpg_key_info['mysql'] }}{% endif %}"
 
-# mysql service
+# service configuration
 _mysql_service_daemon:
   Debian:
     mariadb:
@@ -80,7 +81,7 @@ _mysql_service_daemon:
 
 mysql_service_daemon: "{% if install_mariadb | bool %}{{ _mysql_service_daemon[ansible_os_family]['mariadb']['name'] }}{% else %}{{ _mysql_service_daemon[ansible_os_family]['mysql']['name'] }}{% endif %}"
 
-mysql_port: 3306
+distro_short_name: "{% if 'CentOS' in ansible_distribution %}el{% else %}fc{% endif %}"
 
 config_templates:
   - {src: "sysctl.d/99-sysctl.conf.j2", dest: "/etc/sysctl.d/99-sysctl.conf", mode: "0644"}
