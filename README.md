@@ -1,25 +1,76 @@
-Role Name
-=========
+## mysql
 
-> A brief description of the role goes here.
+> A role to install mysql/mariadb on supported distros.
 
-Requirements
-------------
+## Requirements
 
 Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
 
-Role Variables
---------------
+## Role Variables
+
 
 A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
 
 The variables below can be edited in [`defaults/main.yml`](defaults/main.yml) to customize the deployment:
 
+### installation settings
+```yaml
+mysql_install_settings:
+  use_mariadb: false
+  version: 8.0
+  root_password: ''
+```
 
-Dependencies
-------------
+### configuration settings
+```yaml
+mysql_conf_settings:
+  port: 3306
+  bind_address: "127.0.0.1"
+  datadir: "/var/lib/mysql/"
+  socket: "/var/run/mysqld/mysqld.sock"
+  pid_file: "/var/run/mysqld/mysqld.pid"
+  skip_name_resolve: false
+  sql_mode: ''
+  log_error: ''
+  slow_query_log_file: '/var/log/mysql/mysql-slow.log'
+  slow_query_time: 2
+  key_buffer_size: "256M"
+  max_allowed_packet: "64M"
+  table_open_cache: 256
+  sort_buffer_size: "1M"
+  read_buffer_size: "1M"
+  read_rnd_buffer_size: "4M"
+  myisam_sort_buffer_size: "64M"
+  thread_cache_size: 8
+  query_cache_type: 0
+  query_cache_size: "16M"
+  query_cache_limit: "1M"
+  max_connections: 150
+  tmp_table_size: "16M"
+  max_heap_table_size: "16M"
+  group_concat_max_len: 1024
+  join_buffer_size: 262144
+  wait_timeout: 28800
+  lower_case_table_names: 0
+  event_scheduler_state: "OFF"
+  binlog_format: "ROW"
+  innodb_file_per_table: 1
+  innodb_buffer_pool_size: "1G"
+  innodb_log_file_size: "256M"
+  innodb_log_buffer_size: "128M"
+  innodb_flush_log_at_trx_commit: 1
+  innodb_lock_wait_timeout: 50
+  innodb_flush_method: "O_DIRECT"
+  innodb_autoinc_lock_mode: 2
+  innodb_thread_concurrency: 0
+  innodb_stats_on_metadata: "OFF"
+  innodb_buffer_pool_instances: 1
+```
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+
+## Dependencies
+
+None.
 
 Example Playbook
 ----------------
@@ -33,12 +84,11 @@ Including an example of how to use your role (for instance, with variables passe
 ```
 
 
-License
--------
+## License
 
 [Apache License 2.0](./LICENSE)
 
-Author Information
-------------------
+
+## Author Information
 
 Created by [hybridadmin](https://github.com/hybridadmin).

@@ -8,7 +8,7 @@
       executable: /bin/bash
   become: true
   changed_when: false
-  when: not (install_mariadb | bool) and ansible_os_family == 'RedHat' and mysql_server_settings.version is version('8.0', '>=')
+  when: not (mysql_install_settings.use_mariadb | bool) and ansible_os_family == 'RedHat' and mysql_install_settings.version is version('8.0', '>=')
 
 - name: ensure /var/run/mysqld is present
   file:

@@ -1,11 +1,13 @@
 ---
 
-install_mariadb: true
-#install_mariadb: false
-
-mysql_server_settings:
-  version: 10.4
+# installation settings
+mysql_install_settings:
+  use_mariadb: false
+  version: 8.0
   root_password: ''
+
+# configuration settings
+mysql_conf_settings:
   port: 3306
   bind_address: "127.0.0.1"
   datadir: "/var/lib/mysql/"

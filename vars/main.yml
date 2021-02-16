@@ -30,9 +30,9 @@ _mysql_package_list:
     mysql:
       - mysql-community-server
 
-mysql_package_list: "{% if install_mariadb | bool %}{{ _mysql_package_list[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_package_list[ansible_os_family]['mysql'] }}{% endif %}"
+mysql_package_list: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mysql_package_list[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_package_list[ansible_os_family]['mysql'] }}{% endif %}"
 
-mysql_server_type: "{% if install_mariadb | bool %}mariadb{% else %}mysql{% endif %}"
+mysql_server_type: "{% if mysql_install_settings.use_mariadb | bool %}mariadb{% else %}mysql{% endif %}"
 _mysql_conf_dir:
   Debian:
     mariadb:
@@ -60,7 +60,7 @@ _mysql_repo_file_mapping:
     mysql:
       - { source: "yum.repos.d/mysql/mysql-community.repo.j2", dest: "/etc/yum.repos.d/mysql-community.repo" }
 
-mysql_repo_file_info: "{% if install_mariadb | bool %}{{ _mysql_repo_file_mapping[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_repo_file_mapping[ansible_os_family]['mysql'] }}{% endif %}"
+mysql_repo_file_info: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mysql_repo_file_mapping[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_repo_file_mapping[ansible_os_family]['mysql'] }}{% endif %}"
 
 _rpm_gpg_key_info:
   mariadb:
@@ -68,7 +68,7 @@ _rpm_gpg_key_info:
   mysql:
     - { url: "https://repo.mysql.com/RPM-GPG-KEY-mysql", dest: "/tmp/RPM-GPG-KEY-mysql"}
 
-rpm_gpg_key_info: "{% if install_mariadb | bool %}{{ _rpm_gpg_key_info['mariadb'] }}{% else %}{{ _rpm_gpg_key_info['mysql'] }}{% endif %}"
+rpm_gpg_key_info: "{% if mysql_install_settings.use_mariadb | bool %}{{ _rpm_gpg_key_info['mariadb'] }}{% else %}{{ _rpm_gpg_key_info['mysql'] }}{% endif %}"
 
 # https://dev.mysql.com/doc/refman/8.0/en/checking-gpg-signature.html
 _apt_gpg_key_info:
@@ -77,7 +77,7 @@ _apt_gpg_key_info:
   mysql:
     - { server: "keys.gnupg.net", fingerprint: "A4A9406876FCBD3C456770C88C718D3B5072E1F5" }
 
-apt_gpg_key_info: "{% if install_mariadb | bool %}{{ _apt_gpg_key_info['mariadb'] }}{% else %}{{ _apt_gpg_key_info['mysql'] }}{% endif %}"
+apt_gpg_key_info: "{% if mysql_install_settings.use_mariadb | bool %}{{ _apt_gpg_key_info['mariadb'] }}{% else %}{{ _apt_gpg_key_info['mysql'] }}{% endif %}"
 
 # service configuration
 _mysql_service_daemon:
@@ -92,7 +92,7 @@ _mysql_service_daemon:
     mysql:
       name: mysqld
 
-mysql_service_daemon: "{% if install_mariadb | bool %}{{ _mysql_service_daemon[ansible_os_family]['mariadb']['name'] }}{% else %}{{ _mysql_service_daemon[ansible_os_family]['mysql']['name'] }}{% endif %}"
+mysql_service_daemon: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mysql_service_daemon[ansible_os_family]['mariadb']['name'] }}{% else %}{{ _mysql_service_daemon[ansible_os_family]['mysql']['name'] }}{% endif %}"
 
 distro_short_name: "{% if 'CentOS' in ansible_distribution %}el{% else %}fc{% endif %}"
 
