@@ -8,12 +8,10 @@ Any pre-requisites that may not be covered by Ansible itself or the role should 
 
 ## Role Variables
 
-
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
-
 The variables below can be edited in [`defaults/main.yml`](defaults/main.yml) to customize the deployment:
 
-### installation settings
+
+### Installation settings
 ```yaml
 mysql_install_settings:
   use_mariadb: false
@@ -21,7 +19,7 @@ mysql_install_settings:
   root_password: ''
 ```
 
-### configuration settings
+### Configuration settings
 ```yaml
 mysql_conf_settings:
   port: 3306
