@@ -5,6 +5,7 @@
     {{ ansible_pkg_mgr }} name={{ mysql_package_list }} state=present update_cache=yes
   notify:
     - initialize mysql
+    - ensure /var/run/mysqld is present
     - custom configuration
     - start mysql service
 

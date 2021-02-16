@@ -1,6 +1,6 @@
 [mariadb]
-name = MariaDB-{{ mysql_version }}
-baseurl=http://yum.mariadb.org/{{ mysql_version }}/{{ ansible_distribution | lower }}{{ ansible_distribution_major_version }}-amd64
+name = MariaDB-{{ mysql_server_settings.version }}
+baseurl=http://yum.mariadb.org/{{ mysql_server_settings.version }}/{{ ansible_distribution | lower }}{{ ansible_distribution_major_version }}-amd64
 {% if 'dnf' in ansible_pkg_mgr %}
 module_hotfixes=1
 {% endif %}

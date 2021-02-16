@@ -1,6 +1,6 @@
-[mysql{{ mysql_version | regex_replace('\\.', '') }}-community]
-name=MySQL {{ mysql_version }} Community Server
-baseurl=http://repo.mysql.com/yum/mysql-{{ mysql_version }}-community/{{ distro_short_name }}/{{ ansible_distribution_major_version }}/$basearch/
+[mysql{{ mysql_server_settings.version | regex_replace('\\.', '') }}-community]
+name=MySQL {{ mysql_server_settings.version }} Community Server
+baseurl=http://repo.mysql.com/yum/mysql-{{ mysql_server_settings.version }}-community/{{ distro_short_name }}/{{ ansible_distribution_major_version }}/$basearch/
 enabled=1
 gpgcheck=1
 gpgkey=https://repo.mysql.com/RPM-GPG-KEY-mysql

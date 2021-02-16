@@ -1,5 +1,6 @@
 ---
 
+# package configuration
 _basic_system_packages:
   default:
     - gnupg2
@@ -12,7 +13,6 @@ _basic_system_packages:
 
 basic_system_packages: "{{ _basic_system_packages['default'] + _basic_system_packages[ansible_os_family] }}"
 
-# package configuration
 _mysql_package_list:
   Debian:
     mariadb:
@@ -32,7 +32,20 @@ _mysql_package_list:
 
 mysql_package_list: "{% if install_mariadb | bool %}{{ _mysql_package_list[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_package_list[ansible_os_family]['mysql'] }}{% endif %}"
 
-mysql_conf_file: "{% if install_mariadb | bool %}/etc/mariadb/conf.d/99-mysql-custom.cnf{% else %}/etc/mysql/conf.d/99-mysql-custom.cnf{% endif %}"
+mysql_server_type: "{% if install_mariadb | bool %}mariadb{% else %}mysql{% endif %}"
+_mysql_conf_dir:
+  Debian:
+    mariadb:
+      path: "/etc/mysql/conf.d"
+    mysql:
+      path: "/etc/mysql/conf.d"
+  RedHat:
+    mysql:
+      path: "/etc/my.cnf.d"
+    mariadb:
+      path: "/etc/my.cnf.d"
+
+mysql_conf_dir: "{{ _mysql_conf_dir[ansible_os_family][mysql_server_type]['path'] }}"
 
 # repo configuration
 _mysql_repo_file_mapping:

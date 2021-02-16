@@ -1,4 +1,11 @@
 # https://www.percona.com/blog/2020/06/30/mysql-101-parameters-to-tune-for-mysql-performance/
+[client]
+port            = {{ mysql_server_settings.port }}
+socket          = {{ mysql_server_settings.socket }}
+
+[mysqld_safe]
+socket          = {{ mysql_server_settings.socket }}
+nice            = 0
 
 [mysqld]
 {% if mysql_server_settings.port|int != 3306 %}
@@ -27,7 +34,7 @@ slow_query_log_file = {{ mysql_server_settings.slow_query_log_file }}
 long_query_time = {{ mysql_server_settings.slow_query_time }}
 {% endif %}
 
-{% if  mysql_version is version('5.7', '<=') %}
+{% if  mysql_server_settings.version is version('5.7', '<=') %}
 # Disabling symbolic-links is recommended to prevent assorted security risks
 symbolic-links = 0
 {% endif %}
@@ -41,7 +48,7 @@ read_buffer_size = {{ mysql_server_settings.read_buffer_size }}
 read_rnd_buffer_size = {{ mysql_server_settings.read_rnd_buffer_size }}
 myisam_sort_buffer_size = {{ mysql_server_settings.myisam_sort_buffer_size }}
 thread_cache_size = {{ mysql_server_settings.thread_cache_size }}
-{% if  mysql_version is version('5.7', '<=') %}
+{% if  mysql_server_settings.version is version('5.7', '<=') %}
 query_cache_type = {{ mysql_server_settings.query_cache_type }}
 query_cache_size = {{ mysql_server_settings.query_cache_size }}
 query_cache_limit = {{ mysql_server_settings.query_cache_limit }}
@@ -73,7 +80,5 @@ innodb_buffer_pool_instances = {{ mysql_server_settings.innodb_buffer_pool_insta
 
 [mysqldump]
 quick
+quote-names
 max_allowed_packet = {{ mysql_server_settings.max_allowed_packet }}
-
-[mysqld_safe]
-pid-file = {{ mysql_server_settings.pid_file }}

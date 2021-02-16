@@ -32,6 +32,6 @@
   with_items:
     - "{{ rpm_gpg_key_info }}"
 
-- name: update package cache
-  action: >
-    {{ ansible_pkg_mgr }} update_cache=yes
+#- name: update package cache
+#  action: >
+#    {{ ansible_pkg_mgr }} update_cache=yes

@@ -4,14 +4,14 @@
   mysql_user:
     check_implicit_admin: yes
     name: root
-    password: "{{ mysql_root_password }}"
+    password: "{{ mysql_server_settings.root_password }}"
     host: "{{ item }}"
     state: present
   with_items:
     - localhost
     - 127.0.0.1
     - ::1
-  when: mysql_root_password|length > 0
+  when: mysql_server_settings.root_password|length > 0
 
 - name: Reload privilege tables
   shell: |
