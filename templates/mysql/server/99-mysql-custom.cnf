@@ -15,6 +15,7 @@ bind-address = {{ mysql_conf_settings.bind_address }}
 datadir = {{ mysql_conf_settings.datadir }}
 socket = {{ mysql_conf_settings.socket }}
 pid-file = {{ mysql_conf_settings.pid_file }}
+skip-external-locking
 {% if mysql_conf_settings.skip_name_resolve | bool %}
 skip-name-resolve
 {% endif %}
@@ -22,11 +23,14 @@ skip-name-resolve
 sql_mode = {{ mysql_conf_settings.sql_mode }}
 {% endif %}
 
-{% if mysql_conf_settings.log_error|int >0 %}
 # Logging configuration.
+{% if mysql_conf_settings.log_error|int >0 %}
 log-error = {{ mysql_conf_settings.log_error }}
+{% else %}
+log-error = /var/log/mysql/mysql.log
 {% endif %}
 
+log_warnings = 2
 {% if mysql_conf_settings.slow_query_log_file| int > 0 %}
 # Slow query log configuration.
 slow_query_log = 1
@@ -48,7 +52,7 @@ read_buffer_size = {{ mysql_conf_settings.read_buffer_size }}
 read_rnd_buffer_size = {{ mysql_conf_settings.read_rnd_buffer_size }}
 myisam_sort_buffer_size = {{ mysql_conf_settings.myisam_sort_buffer_size }}
 thread_cache_size = {{ mysql_conf_settings.thread_cache_size }}
-{% if  mysql_install_settings.version is version('5.7', '<=') %}
+{% if mysql_install_settings.use_mariadb | bool or  mysql_install_settings.version is version('5.7', '<=') %}
 query_cache_type = {{ mysql_conf_settings.query_cache_type }}
 query_cache_size = {{ mysql_conf_settings.query_cache_size }}
 query_cache_limit = {{ mysql_conf_settings.query_cache_limit }}
@@ -64,6 +68,13 @@ wait_timeout = {{ mysql_conf_settings.wait_timeout }}
 lower_case_table_names = {{ mysql_conf_settings.lower_case_table_names }}
 event_scheduler = {{ mysql_conf_settings.event_scheduler_state }}
 binlog_format = {{ mysql_conf_settings.binlog_format }}
+
+{% if mysql_install_settings.use_mariadb | bool %}
+log_bin                 = /var/log/mysql/mariadb-bin
+log_bin_index           = /var/log/mysql/mariadb-bin.index
+expire_logs_days        = 10
+max_binlog_size         = 100M
+{% endif %}
 
 # InnoDB settings.
 innodb_file_per_table = {{ mysql_conf_settings.innodb_file_per_table }}

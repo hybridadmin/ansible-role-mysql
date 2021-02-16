@@ -5,8 +5,8 @@
     {{ ansible_pkg_mgr }} name={{ mysql_package_list }} state=present update_cache=yes
   notify:
     - initialize mysql
-    - ensure /var/run/mysqld is present
-    - custom configuration
+    - ensure mysqld dirs exist
+    - add custom configuration files
     - start mysql service
 
 - name: Flush handlers

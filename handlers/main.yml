@@ -10,22 +10,28 @@
   changed_when: false
   when: not (mysql_install_settings.use_mariadb | bool) and ansible_os_family == 'RedHat' and mysql_install_settings.version is version('8.0', '>=')
 
-- name: ensure /var/run/mysqld is present
+- name: ensure mysqld dirs exist
   file:
-    path: "/var/run/mysqld"
+    path: "{{ item }}"
     owner: mysql
     group: root
     state: directory
     recurse: yes
     mode: '0755'
   changed_when: false
-  when: ansible_os_family == 'RedHat'
+#  when: ansible_os_family == 'RedHat'
+  with_items:
+    - "{{ mysql_dir_list }}"
 
-- name: custom configuration
+- name: add custom configuration files
   template:
-    src: "mysql/server/99-mysql-custom.cnf"
-    dest: "{{ mysql_conf_dir }}/99-server.cnf"
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     mode: 0644
+    backup: yes
+  with_items:
+  - { src: "{{ mysql_my_cnf_template }}", dest: "{{ mysql_conf.file_path }}" }
+  - { src: "mysql/server/99-mysql-custom.cnf", dest: "{{ mysql_conf.include_dir }}/99-server.cnf" }
 
 - name: start mysql service
   systemd:

@@ -33,19 +33,24 @@ _mysql_package_list:
 mysql_package_list: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mysql_package_list[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_package_list[ansible_os_family]['mysql'] }}{% endif %}"
 
 mysql_server_type: "{% if mysql_install_settings.use_mariadb | bool %}mariadb{% else %}mysql{% endif %}"
-_mysql_conf_dir:
+
+_mysql_conf:
   Debian:
     mariadb:
-      path: "/etc/mysql/conf.d"
+      file_path: "/etc/mysql/my.cnf"
+      include_dir: "/etc/mysql/conf.d"
     mysql:
-      path: "/etc/mysql/conf.d"
+      file_path: "/etc//mysql/my.cnf"
+      include_dir: "/etc/mysql/conf.d"
   RedHat:
     mysql:
-      path: "/etc/my.cnf.d"
+      file_path: "/etc/my.cnf"
+      include_dir: "/etc/my.cnf.d"
     mariadb:
-      path: "/etc/my.cnf.d"
+      file_path: "/etc/my.cnf"
+      include_dir: "/etc/my.cnf.d"
 
-mysql_conf_dir: "{{ _mysql_conf_dir[ansible_os_family][mysql_server_type]['path'] }}"
+mysql_conf: "{{ _mysql_conf[ansible_os_family][mysql_server_type] }}"
 
 # repo configuration
 _mysql_repo_file_mapping:
@@ -93,6 +98,18 @@ _mysql_service_daemon:
       name: mysqld
 
 mysql_service_daemon: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mysql_service_daemon[ansible_os_family]['mariadb']['name'] }}{% else %}{{ _mysql_service_daemon[ansible_os_family]['mysql']['name'] }}{% endif %}"
+
+_mysql_my_cnf_template:
+  mariadb:
+    source: "mysql/server/mariadb.my.cnf.j2"
+  mysql:
+    source: "mysql/server/mysql.my.cnf.j2"
+
+mysql_my_cnf_template: "{{ _mysql_my_cnf_template[mysql_server_type]['source'] }}"
+
+_mysql_dir_list:
+  - "/var/run/mysqld"
+mysql_dir_list: "{% if mysql_conf_settings.log_error | length > 0 %}{{ _mysql_dir_list + [''+ mysql_conf_settings.log_error | dirname] }}{% else %}{{ _mysql_dir_list + ['/var/log/mysql'] }}{% endif %}"
 
 distro_short_name: "{% if 'CentOS' in ansible_distribution %}el{% else %}fc{% endif %}"
 
