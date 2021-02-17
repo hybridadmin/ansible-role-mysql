@@ -31,7 +31,7 @@
     backup: yes
   with_items:
   - { src: "{{ mysql_my_cnf_template }}", dest: "{{ mysql_conf.file_path }}" }
-  - { src: "mysql/server/99-mysql-custom.cnf", dest: "{{ mysql_conf.include_dir }}/99-server.cnf" }
+  - { src: "mysql/server/99-server.cnf.j2", dest: "{{ mysql_conf.include_dir }}/99-server.cnf" }
 
 - name: start mysql service
   systemd:

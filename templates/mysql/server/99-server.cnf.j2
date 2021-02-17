@@ -29,7 +29,6 @@ log-error = {{ mysql_conf_settings.log_error }}
 {% else %}
 log-error = /var/log/mysql/mysql.log
 {% endif %}
-
 log_warnings = 2
 {% if mysql_conf_settings.slow_query_log_file| int > 0 %}
 # Slow query log configuration.
