@@ -51,4 +51,4 @@ mysql_conf_settings:
   innodb_buffer_pool_instances: 1
 
 galera_cluster_settings:
-  enabled: false
+  enabled: true
