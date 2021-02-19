@@ -1,4 +1,4 @@
 [galera_cluster]
-node1 node_ip=192.168.12.10 node_role=master
-node2 node_ip=192.168.12.11 node_role=slave
-node3 node_ip=192.168.12.12 node_role=slave
+node1 node_ip=192.168.12.10 node_role=master node_id=1
+node2 node_ip=192.168.12.11 node_role=slave node_id=2
+node3 node_ip=192.168.12.12 node_role=slave node_id=3

@@ -8,6 +8,7 @@ socket          = {{ mysql_conf_settings.socket }}
 nice            = 0
 
 [mysqld]
+user = mysql
 {% if mysql_conf_settings.port|int != 3306 %}
 port = {{ mysql_conf_settings.port }}
 {% endif %}

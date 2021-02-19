@@ -1,5 +1,20 @@
 ---
 
+- name: selinux permissive mode for Cluster traffic
+  seport:
+    ports: "{{ item.port }}"
+    proto: "{{ item.port }}"
+    setype: mysqld_port_t
+    state: present
+  with_items:
+    - { port: "4567", proto: "tcp" }
+    - { port: "4567", proto: "udp" }
+    - { port: "4568", proto: "tcp" }
+    - { port: "4444", proto: "tcp" }
+  when: >
+    ansible_selinux is defined and not ansible_selinux | bool and ansible_selinux.status == 'enabled'
+    and galera_cluster_settings.enabled | bool
+
 - name: disable SELinux for mysqld
   selinux_permissive:
     name: mysqld_t

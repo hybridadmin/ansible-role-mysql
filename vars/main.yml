@@ -5,6 +5,7 @@ _basic_system_packages:
   default:
     - gnupg2
     - curl
+    - rsync
   Debian:
     - software-properties-common
     - procps
