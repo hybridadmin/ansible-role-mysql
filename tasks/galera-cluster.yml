@@ -1,0 +1,54 @@
+---
+# https://galeracluster.com/library/training/tutorials/galera-installation.html
+
+- name: disable SELinux for mysqld
+  selinux_permissive:
+    name: mysqld_t
+    permissive: true
+  when: ansible_selinux is defined and not ansible_selinux | bool and ansible_selinux.status == 'enabled'
+
+- name: apparmor - disabling profile for mysqld
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+  register: mysqld_apparmor_disabled
+  become: true
+  with_items:
+    - { src: "/etc/apparmor.d/usr.sbin.mysqld", dest: "/etc/apparmor.d/disable/usr.sbin.mysqld" }
+  when: ansible_apparmor.status == 'enabled'
+  notify:
+    - apparmor | reload apparmor profiles
+
+- name: add mysql galera repo file
+  template:
+    src: "{{ item.source }}"
+    dest: "{{ item.dest }}"
+    mode: '0644'
+  with_items:
+    - "{{ mysql_galera_repo_info }}"
+
+- name: apt-key - add galera mysql key
+  apt_key:
+    keyserver: "keyserver.ubuntu.com"
+    id: "44B7345738EBDE52594DAD80D669017EBC19DDBA"
+  when: ansible_os_family == 'Debian'
+
+- name: rpm_key - add galera mysql key
+  shell: |
+    set -o pipefail
+    curl -fsSL {{ item.url }} -o {{ item.dest }}
+    rpm --import {{ item.dest }}
+  args:
+      executable: /bin/bash
+  become: true
+  changed_when: false
+  when: ansible_os_family == 'RedHat'
+  with_items:
+    - { url: "https://releases.galeracluster.com/GPG-KEY-galeracluster.com", dest: "/tmp/GPG-KEY-galeracluster.com" }
+
+
+- name: install mysql galera packages
+  action: >
+    {{ ansible_pkg_mgr }} name={{ mysql_galera_package_list }} state=present update_cache=yes
+  when: not mysql_install_settings.use_mariadb | bool

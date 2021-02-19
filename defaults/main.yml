@@ -2,8 +2,8 @@
 
 # installation settings
 mysql_install_settings:
-  use_mariadb: true
-  version: 10.4
+  use_mariadb: false
+  version: 8.0
   root_password: ''
 
 # configuration settings
@@ -49,3 +49,6 @@ mysql_conf_settings:
   innodb_thread_concurrency: 0
   innodb_stats_on_metadata: "OFF"
   innodb_buffer_pool_instances: 1
+
+galera_cluster_settings:
+  enabled: false

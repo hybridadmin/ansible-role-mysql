@@ -1,10 +1,13 @@
 ---
-# tasks file for ansible-role-mysql
 
 - include: repo-setup.yml
+
+- include: pre-install.yml
 
 - include: install.yml
 
 - include: secure-mysql.yml
 
 - include: configure.yml
+
+#- include: galera-cluster.yml

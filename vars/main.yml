@@ -13,6 +13,9 @@ _basic_system_packages:
 
 basic_system_packages: "{{ _basic_system_packages['default'] + _basic_system_packages[ansible_os_family] }}"
 
+mysql_server_type: "{% if mysql_install_settings.use_mariadb | bool %}mariadb{% else %}mysql{% endif %}"
+galera_version: "{% if mysql_install_settings.version is version('5.7', '>=') %}4{% else %}3{% endif %}"
+
 _mysql_package_list:
   Debian:
     mariadb:
@@ -21,6 +24,10 @@ _mysql_package_list:
       - mariadb-common
     mysql:
       - mysql-server
+    mysql_galera:
+      - galera-{{ galera_version }}
+      - galera-arbitrator-{{ galera_version }}
+      - mysql-wsrep-{{ mysql_install_settings.version }}
   RedHat:
     mariadb:
       - MariaDB-server
@@ -29,10 +36,22 @@ _mysql_package_list:
       - MariaDB-common
     mysql:
       - mysql-community-server
+    mysql_galera:
+      - galera-{{ galera_version }}
+      - mysql-wsrep-{{ mysql_install_settings.version }}
 
-mysql_package_list: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mysql_package_list[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_package_list[ansible_os_family]['mysql'] }}{% endif %}"
-
-mysql_server_type: "{% if mysql_install_settings.use_mariadb | bool %}mariadb{% else %}mysql{% endif %}"
+#mysql_package_list: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mysql_package_list[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_package_list[ansible_os_family]['mysql'] }}{% endif %}"
+#mysql_galera_package_list: "{{ _mysql_package_list[ansible_os_family]['mysql_galera'] }}"
+mysql_package_list: |
+     {% if galera_cluster_settings.enabled | bool %}
+     {% if mysql_install_settings.use_mariadb | bool %}
+     {{ _mysql_package_list[ansible_os_family][mysql_server_type] }}
+     {% else %}
+     {{ _mysql_package_list[ansible_os_family]['mysql_galera'] }}
+     {% endif %}
+     {% else %}
+     {{ _mysql_package_list[ansible_os_family][mysql_server_type] }}
+     {% endif%}
 
 _mysql_conf:
   Debian:
@@ -40,7 +59,7 @@ _mysql_conf:
       file_path: "/etc/mysql/my.cnf"
       include_dir: "/etc/mysql/conf.d"
     mysql:
-      file_path: "/etc//mysql/my.cnf"
+      file_path: "/etc/mysql/my.cnf"
       include_dir: "/etc/mysql/conf.d"
   RedHat:
     mysql:
@@ -59,30 +78,71 @@ _mysql_repo_file_mapping:
       - { source: "sources.list.d/mariadb/MariaDB.list.j2", dest: "/etc/apt/sources.list.d/MariaDB.list" }
     mysql:
       - { source: "sources.list.d/mysql/mysql.list.j2", dest: "/etc/apt/sources.list.d/mysql.list" }
+    mysql_galera:
+      - { source: "sources.list.d/galera/galera.list.j2", dest: "/etc/apt/sources.list.d/galera.list" }
+      - { source: "preferences.d/galera/galera.j2", dest: "/etc/apt/preferences.d/galera" }
   RedHat:
     mariadb:
       - { source: "yum.repos.d/mariadb/MariaDB.repo.j2", dest: "/etc/yum.repos.d/MariaDB.repo" }
     mysql:
       - { source: "yum.repos.d/mysql/mysql-community.repo.j2", dest: "/etc/yum.repos.d/mysql-community.repo" }
+    mysql_galera:
+      - { source: "yum.repos.d/galera/Galera.repo.j2", dest: "/etc/yum.repos.d/Galera.repo" }
 
-mysql_repo_file_info: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mysql_repo_file_mapping[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_repo_file_mapping[ansible_os_family]['mysql'] }}{% endif %}"
+#mysql_repo_file_info: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mysql_repo_file_mapping[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_repo_file_mapping[ansible_os_family]['mysql'] }}{% endif %}"
+#mysql_galera_repo_info: "{{ _mysql_repo_file_mapping[ansible_os_family]['mysql_galera'] }}"
+mysql_repo_file_info: |
+     {% if galera_cluster_settings.enabled | bool %}
+     {% if mysql_install_settings.use_mariadb | bool %}
+     {{ _mysql_repo_file_mapping[ansible_os_family][mysql_server_type] }}
+     {% else %}
+     {{ _mysql_repo_file_mapping[ansible_os_family]['mysql_galera'] }}
+     {% endif %}
+     {% else %}
+     {{ _mysql_repo_file_mapping[ansible_os_family][mysql_server_type] }}
+     {% endif%}
 
 _rpm_gpg_key_info:
   mariadb:
     - { url: "https://yum.mariadb.org/RPM-GPG-KEY-MariaDB", dest: "/tmp/RPM-GPG-KEY-MariaDB" }
   mysql:
     - { url: "https://repo.mysql.com/RPM-GPG-KEY-mysql", dest: "/tmp/RPM-GPG-KEY-mysql"}
+  mysql_galera:
+    - { url: "https://releases.galeracluster.com/GPG-KEY-galeracluster.com", dest: "/tmp/GPG-KEY-galeracluster.com" }
 
-rpm_gpg_key_info: "{% if mysql_install_settings.use_mariadb | bool %}{{ _rpm_gpg_key_info['mariadb'] }}{% else %}{{ _rpm_gpg_key_info['mysql'] }}{% endif %}"
+#rpm_gpg_key_info: "{% if mysql_install_settings.use_mariadb | bool %}{{ _rpm_gpg_key_info['mariadb'] }}{% else %}{{ _rpm_gpg_key_info['mysql'] }}{% endif %}"
+rpm_gpg_key_info: |
+     {% if galera_cluster_settings.enabled | bool %}
+     {% if mysql_install_settings.use_mariadb | bool %}
+     {{ _rpm_gpg_key_info[mysql_server_type] }}
+     {% else %}
+     {{ _rpm_gpg_key_info['mysql_galera'] }}
+     {% endif %}
+     {% else %}
+     {{ _rpm_gpg_key_info[mysql_server_type] }}
+     {% endif%}
 
 # https://dev.mysql.com/doc/refman/8.0/en/checking-gpg-signature.html
+# keys.gnupg.net
 _apt_gpg_key_info:
   mariadb:
     - { server: "keyserver.ubuntu.com", fingerprint: "177F4010FE56CA3336300305F1656F24C74CD1D8" }
   mysql:
-    - { server: "keys.gnupg.net", fingerprint: "A4A9406876FCBD3C456770C88C718D3B5072E1F5" }
+    - { server: "keyserver.ubuntu.com", fingerprint: "A4A9406876FCBD3C456770C88C718D3B5072E1F5" }
+  mysql_galera:
+    - { server: "keyserver.ubuntu.com", fingerprint: "44B7345738EBDE52594DAD80D669017EBC19DDBA" }
 
-apt_gpg_key_info: "{% if mysql_install_settings.use_mariadb | bool %}{{ _apt_gpg_key_info['mariadb'] }}{% else %}{{ _apt_gpg_key_info['mysql'] }}{% endif %}"
+#apt_gpg_key_info: "{% if mysql_install_settings.use_mariadb | bool %}{{ _apt_gpg_key_info['mariadb'] }}{% else %}{{ _apt_gpg_key_info['mysql'] }}{% endif %}"
+apt_gpg_key_info: |
+     {% if galera_cluster_settings.enabled | bool %}
+     {% if mysql_install_settings.use_mariadb | bool %}
+     {{ _apt_gpg_key_info[mysql_server_type] }}
+     {% else %}
+     {{ _apt_gpg_key_info['mysql_galera'] }}
+     {% endif %}
+     {% else %}
+     {{ _apt_gpg_key_info[mysql_server_type] }}
+     {% endif%}
 
 # service configuration
 _mysql_service_daemon:
@@ -99,13 +159,31 @@ _mysql_service_daemon:
 
 mysql_service_daemon: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mysql_service_daemon[ansible_os_family]['mariadb']['name'] }}{% else %}{{ _mysql_service_daemon[ansible_os_family]['mysql']['name'] }}{% endif %}"
 
-_mysql_my_cnf_template:
-  mariadb:
-    source: "mysql/server/mariadb.my.cnf.j2"
-  mysql:
-    source: "mysql/server/mysql.my.cnf.j2"
+#_mysql_conf_templates:
+#  mariadb:
+#    source: "mysql/server/mariadb.my.cnf.j2"
+#  mysql:
+#    source: "mysql/server/mysql.my.cnf.j2"
 
-mysql_my_cnf_template: "{{ _mysql_my_cnf_template[mysql_server_type]['source'] }}"
+#mysql_conf_templates: "{{ _mysql_conf_templates[mysql_server_type]['source'] }}"
+_mysql_conf_files:
+  mycnf:
+    mariadb:
+      - { src: "mysql/server/mariadb.my.cnf.j2", dest: "{{ mysql_conf.file_path }}" }
+    mysql:
+      - { src: "mysql/server/mysql.my.cnf.j2", dest: "{{ mysql_conf.file_path }}" }
+  server:
+    - { src: "mysql/server/99-server.cnf.j2", dest: "{{ mysql_conf.include_dir }}/server.cnf" }
+  mysql_galera:
+    - { src: "mysql/galera/99-galera-cluster.cnf", dest: "{{ mysql_conf.include_dir }}/galera.cnf" }
+
+
+mysql_conf_templates: |
+     {% if galera_cluster_settings.enabled | bool %}
+     {{ _mysql_conf_files['mysql_galera'] + _mysql_conf_files['mycnf'][mysql_server_type] }}
+     {% else %}
+     {{ _mysql_conf_files['server'] + _mysql_conf_files['mycnf'][mysql_server_type] }}
+     {% endif%}
 
 _mysql_dir_list:
   - "/var/run/mysqld"

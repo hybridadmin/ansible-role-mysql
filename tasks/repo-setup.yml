@@ -4,6 +4,21 @@
   action: >
       {{ ansible_pkg_mgr }} name={{ basic_system_packages }} state=present update_cache=yes
 
+- debug:
+    msg: "{{ mysql_package_list }}"
+
+- debug:
+    msg: "{{ mysql_repo_file_info }}"
+
+- debug:
+    msg: "{{ rpm_gpg_key_info }}"
+
+- debug:
+    msg: "{{ apt_gpg_key_info }}"
+
+- debug:
+    msg: "{{ mysql_conf_templates }}"
+
 - name: create repo file
   template:
     src: "{{ item.source }}"
@@ -31,6 +46,16 @@
   when: ansible_os_family == 'RedHat'
   with_items:
     - "{{ rpm_gpg_key_info }}"
+
+- name: redhat - disable mysql mariadb modules
+  shell: |
+    set -o pipefail
+    dnf module disable mysql mariadb -qy
+  args:
+      executable: /bin/bash
+  become: true
+  changed_when: false
+  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version| int >= 8
 
 #- name: update package cache
 #  action: >

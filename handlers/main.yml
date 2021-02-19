@@ -8,7 +8,8 @@
       executable: /bin/bash
   become: true
   changed_when: false
-  when: not (mysql_install_settings.use_mariadb | bool) and ansible_os_family == 'RedHat' and mysql_install_settings.version is version('8.0', '>=')
+  when: not (mysql_install_settings.use_mariadb | bool) and ansible_os_family == 'RedHat'
+  #and mysql_install_settings.version is version('8.0', '>=')
 
 - name: ensure mysqld dirs exist
   file:
@@ -19,7 +20,6 @@
     recurse: yes
     mode: '0755'
   changed_when: false
-#  when: ansible_os_family == 'RedHat'
   with_items:
     - "{{ mysql_dir_list }}"
 
@@ -30,11 +30,31 @@
     mode: 0644
     backup: yes
   with_items:
-  - { src: "{{ mysql_my_cnf_template }}", dest: "{{ mysql_conf.file_path }}" }
-  - { src: "mysql/server/99-server.cnf.j2", dest: "{{ mysql_conf.include_dir }}/99-server.cnf" }
+    - "{{ mysql_conf_templates }}"
+#  - { src: "{{ mysql_conf_templates }}", dest: "{{ mysql_conf.file_path }}" }
+#  - { src: "mysql/server/99-server.cnf.j2", dest: "{{ mysql_conf.include_dir }}/99-server.cnf" }
+
+- name: fix config in /etc/mysql/mysql.conf.d/mysqld.cnf
+  lineinfile:
+    path: "/etc/mysql/mysql.conf.d/mysqld.cnf"
+    state: absent
+    regexp: "{{ item }}"
+  with_items:
+    - "(^datadir.*)"
+    - "(^socket.*)"
+    - "(^log-error.*)"
+    - "(^pid-file.*)"
+  when: ansible_os_family == 'Debian'
 
 - name: start mysql service
   systemd:
     state: started
     name: "{{ mysql_service_daemon }}"
     enabled: yes
+
+- name: apparmor | reload apparmor profiles
+  command: "apparmor_parser -R {{ item }}"
+  become: true
+  with_items:
+    - "/etc/apparmor.d/usr.sbin.mysqld"
+  when: ansible_apparmor.status == 'enabled' and mysqld_apparmor_disabled['changed']

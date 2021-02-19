@@ -26,3 +26,6 @@
 
 
 !includedir {{ mysql_conf.include_dir }}
+{% if ansible_os_family == 'Debian' %}
+!includedir /etc/mysql/mysql.conf.d/
+{% endif %}
