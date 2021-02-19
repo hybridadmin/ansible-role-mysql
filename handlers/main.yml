@@ -49,6 +49,7 @@
     path: /var/log/mysql/mysql.log
     owner: mysql
     group: root
+    state: touch
     mode: '0755'
   when: galera_cluster_settings.enabled | bool
 
