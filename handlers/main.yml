@@ -31,8 +31,6 @@
     backup: yes
   with_items:
     - "{{ mysql_conf_templates }}"
-#  - { src: "{{ mysql_conf_templates }}", dest: "{{ mysql_conf.file_path }}" }
-#  - { src: "mysql/server/99-server.cnf.j2", dest: "{{ mysql_conf.include_dir }}/99-server.cnf" }
 
 - name: fix config in /etc/mysql/mysql.conf.d/mysqld.cnf
   lineinfile:
@@ -51,6 +49,7 @@
     state: started
     name: "{{ mysql_service_daemon }}"
     enabled: yes
+  when: not (galera_cluster_settings.enabled | bool)
 
 - name: apparmor | reload apparmor profiles
   command: "apparmor_parser -R {{ item }}"
