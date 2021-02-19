@@ -53,6 +53,16 @@
     mode: '0755'
   when: galera_cluster_settings.enabled | bool
 
+- name: cluster bootstrap
+  shell: |
+    set -o pipefail
+    /usr/bin/mysqld_bootstrap
+  args:
+      executable: /bin/bash
+  become: true
+  changed_when: false
+  when: galera_cluster_settings.enabled | bool
+
 - name: start mysql service
   systemd:
     state: started
