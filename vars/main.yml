@@ -41,8 +41,6 @@ _mysql_package_list:
       - galera-{{ galera_version }}
       - mysql-wsrep-{{ mysql_install_settings.version }}
 
-#mysql_package_list: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mysql_package_list[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_package_list[ansible_os_family]['mysql'] }}{% endif %}"
-#mysql_galera_package_list: "{{ _mysql_package_list[ansible_os_family]['mysql_galera'] }}"
 mysql_package_list: |
      {% if galera_cluster_settings.enabled | bool %}
      {% if mysql_install_settings.use_mariadb | bool %}
@@ -90,8 +88,6 @@ _mysql_repo_file_mapping:
     mysql_galera:
       - { source: "yum.repos.d/galera/Galera.repo.j2", dest: "/etc/yum.repos.d/Galera.repo" }
 
-#mysql_repo_file_info: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mysql_repo_file_mapping[ansible_os_family]['mariadb'] }}{% else %}{{ _mysql_repo_file_mapping[ansible_os_family]['mysql'] }}{% endif %}"
-#mysql_galera_repo_info: "{{ _mysql_repo_file_mapping[ansible_os_family]['mysql_galera'] }}"
 mysql_repo_file_info: |
      {% if galera_cluster_settings.enabled | bool %}
      {% if mysql_install_settings.use_mariadb | bool %}
@@ -111,7 +107,6 @@ _rpm_gpg_key_info:
   mysql_galera:
     - { url: "https://releases.galeracluster.com/GPG-KEY-galeracluster.com", dest: "/tmp/GPG-KEY-galeracluster.com" }
 
-#rpm_gpg_key_info: "{% if mysql_install_settings.use_mariadb | bool %}{{ _rpm_gpg_key_info['mariadb'] }}{% else %}{{ _rpm_gpg_key_info['mysql'] }}{% endif %}"
 rpm_gpg_key_info: |
      {% if galera_cluster_settings.enabled | bool %}
      {% if mysql_install_settings.use_mariadb | bool %}
@@ -133,7 +128,6 @@ _apt_gpg_key_info:
   mysql_galera:
     - { server: "keyserver.ubuntu.com", fingerprint: "44B7345738EBDE52594DAD80D669017EBC19DDBA" }
 
-#apt_gpg_key_info: "{% if mysql_install_settings.use_mariadb | bool %}{{ _apt_gpg_key_info['mariadb'] }}{% else %}{{ _apt_gpg_key_info['mysql'] }}{% endif %}"
 apt_gpg_key_info: |
      {% if galera_cluster_settings.enabled | bool %}
      {% if mysql_install_settings.use_mariadb | bool %}
@@ -160,13 +154,13 @@ _mysql_service_daemon:
 
 mysql_service_daemon: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mysql_service_daemon[ansible_os_family]['mariadb']['name'] }}{% else %}{{ _mysql_service_daemon[ansible_os_family]['mysql']['name'] }}{% endif %}"
 
-#_mysql_conf_templates:
-#  mariadb:
-#    source: "mysql/server/mariadb.my.cnf.j2"
-#  mysql:
-#    source: "mysql/server/mysql.my.cnf.j2"
+cluster_bootstrap_cmd: |
+     {% if galera_cluster_settings.enabled | bool and mysql_install_settings.use_mariadb | bool %}
+     galera_new_cluster
+     {% else %}
+     /usr/bin/mysqld_bootstrap
+     {% endif %}
 
-#mysql_conf_templates: "{{ _mysql_conf_templates[mysql_server_type]['source'] }}"
 _mysql_conf_files:
   mycnf:
     mariadb:

@@ -9,7 +9,6 @@
   become: true
   changed_when: false
   when: not (mysql_install_settings.use_mariadb | bool) and ansible_os_family == 'RedHat'
-  #and mysql_install_settings.version is version('8.0', '>=')
 
 - name: ensure mysqld dirs exist
   file:
@@ -53,12 +52,13 @@
     mode: '0755'
   when: galera_cluster_settings.enabled | bool
 
-- name: cluster bootstrap
+- name: cluster master bootstrap
   shell: |
     set -o pipefail
-    /usr/bin/mysqld_bootstrap
+    {{ cluster_bootstrap_cmd }}
   args:
       executable: /bin/bash
+      creates: "/var/lib/mysql/grastate.dat"
   become: true
   changed_when: false
   when: galera_cluster_settings.enabled | bool

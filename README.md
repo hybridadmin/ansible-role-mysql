@@ -11,7 +11,7 @@ Any pre-requisites that may not be covered by Ansible itself or the role should 
 The variables below can be edited in [`defaults/main.yml`](defaults/main.yml) to customize the deployment:
 
 
-### Installation settings
+### MySQL installation settings
 ```yaml
 mysql_install_settings:
   use_mariadb: false
@@ -63,6 +63,12 @@ mysql_conf_settings:
   innodb_thread_concurrency: 0
   innodb_stats_on_metadata: "OFF"
   innodb_buffer_pool_instances: 1
+```
+
+### Cluster installation settings
+```yaml
+galera_cluster_settings:
+  enabled: true
 ```
 
 

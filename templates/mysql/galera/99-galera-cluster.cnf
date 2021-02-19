@@ -105,7 +105,11 @@ wsrep_provider_options="gcache.size=300M; gcache.page_size=300M"
 wsrep_cluster_name="GaleraCluster"
 wsrep_cluster_address=gcomm://{{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}
 {% if galera_cluster_settings.enabled | bool and mysql_install_settings.use_mariadb | bool %}
-wsrep_provider=/usr/lib64/galera/libgalera_smm.so
+{% if ansible_os_family == 'Debian' %}
+wsrep_provider=/usr/lib/galera/libgalera_smm.so
+{% else %}
+wsrep_provider=/usr/lib64/galera-{{ galera_version }}/libgalera_smm.so
+{% endif %}
 {% else %}
 {% if ansible_os_family == 'Debian' %}
 wsrep_provider=/usr/lib/galera/libgalera_smm.so
