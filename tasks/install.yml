@@ -8,6 +8,7 @@
     - ensure mysqld dirs exist
     - add custom configuration files
     - fix config in /etc/mysql/mysql.conf.d/mysqld.cnf
+    - mysqld bootstrap fix for logging
     - start mysql service
 
 - name: Flush handlers
