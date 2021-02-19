@@ -10,5 +10,3 @@
   when: not (galera_cluster_settings.enabled | bool)
 
 - include: configure.yml
-
-#- include: galera-cluster.yml
