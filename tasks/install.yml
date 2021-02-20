@@ -14,3 +14,12 @@
 
 - name: Flush handlers
   meta: flush_handlers
+
+- name: disable bootstrapping on master node
+  lineinfile:
+    path: "/var/lib/mysql/grastate.dat"
+    regexp: "{{ item }}"
+    line: "safe_to_bootstrap: 0"
+  with_items:
+    - "(safe.*trap.*\\d{1})"
+  when: galera_cluster_settings.enabled | bool
