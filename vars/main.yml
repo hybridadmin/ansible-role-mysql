@@ -156,7 +156,7 @@ mysql_service_daemon: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mys
 
 cluster_bootstrap_cmd: |
      {% if galera_cluster_settings.enabled | bool and mysql_install_settings.use_mariadb | bool %}
-     galera_new_cluster
+     /usr/bin/galera_new_cluster
      {% else %}
      /usr/bin/mysqld_bootstrap
      {% endif %}
