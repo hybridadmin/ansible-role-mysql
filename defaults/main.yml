@@ -52,3 +52,6 @@ mysql_conf_settings:
 
 galera_cluster_settings:
   enabled: true
+  wsrep_sst_method: rsync
+  wsrep_provider_options: "gcache.size=300M; gcache.page_size=300M"
+  wsrep_cluster_name: "GaleraCluster"
