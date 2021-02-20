@@ -57,8 +57,8 @@
     set -o pipefail
     {{ cluster_bootstrap_cmd }}
   args:
-      executable: /bin/bash
-      creates: "/var/lib/mysql/grastate.dat"
+    executable: /bin/bash
+    creates: "/var/lib/mysql/grastate.dat"
   become: true
   changed_when: false
   when: galera_cluster_settings.enabled | bool

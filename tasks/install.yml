@@ -33,6 +33,7 @@
 #    state: started
 #    msg: "Master is not yet UP"
 #  register: master_is_up
+#  connection: local
 #  when: galera_cluster_settings.enabled | bool
 
 # start mysql on slave nodes
