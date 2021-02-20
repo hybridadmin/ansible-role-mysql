@@ -23,3 +23,16 @@
   with_items:
     - "(safe.*trap.*\\d{1})"
   when: galera_cluster_settings.enabled | bool
+
+#- name: Check master node is UP
+#  wait_for:
+#    host: "localhost"
+#    port: "33069"
+#    delay: 5
+#    timeout: 300
+#    state: started
+#    msg: "Master is not yet UP"
+#  register: master_is_up
+#  when: galera_cluster_settings.enabled | bool
+
+# start mysql on slave nodes
