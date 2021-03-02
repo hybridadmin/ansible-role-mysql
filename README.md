@@ -97,4 +97,4 @@ An example playbook is included below:
 
 ## Author Information
 
-Created by [`hybridadmin`](https://github.com/hybridadmin).
+Created by [`hybridadmin`](https://github.com/hybridadmin)
