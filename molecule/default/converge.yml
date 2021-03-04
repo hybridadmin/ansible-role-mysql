@@ -2,6 +2,6 @@
 - name: Converge
   hosts: all
   tasks:
-    - name: "Include hybridadmin.mariadb"
+    - name: "Include hybridadmin.mysql"
       include_role:
-        name: "ansible-role-mysql"
+        name: "hybridadmin.mysql"
