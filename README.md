@@ -1,6 +1,6 @@
 ## mysql
 
-> A role to install mysql/mariadb on supported distros.
+> A role to install standalone or clustered mysql/mariadb servers on supported distros.
 
 ## Requirements
 
@@ -72,6 +72,8 @@ galera_cluster_settings:
   wsrep_sst_method: rsync
   wsrep_provider_options: "gcache.size=300M; gcache.page_size=300M"
   wsrep_cluster_name: "GaleraCluster"
+  wsrep_sst_user: "mariabackup"
+  wsrep_sst_pass: "tstwytw22211"
 ```
 
 
