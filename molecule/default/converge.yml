@@ -1,12 +1,16 @@
 ---
 - name: Converge
   hosts: all
+  gather_facts: no
   tasks:
     - name: Install iproute
       package:
         name: iproute
         state: present
       when: ansible_distribution == 'Fedora'
+
+    - name: Gathering facts
+      setup:
 
     - name: "Include hybridadmin.mysql"
       include_role:
