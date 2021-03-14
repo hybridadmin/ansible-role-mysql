@@ -79,6 +79,11 @@ jobs:
         with:
           python-version: '3.x'
 
+      - name: Disable Apparmor
+        run: |
+          sudo ln -s /etc/apparmor.d/usr.sbin.mysqld /etc/apparmor.d/disable/
+          sudo apparmor_parser -R /etc/apparmor.d/usr.sbin.mysqld
+
       - name: Install test dependencies.
         run: pip3 install ansible molecule-docker yamllint ansible-lint==4.3.7
 
