@@ -38,3 +38,16 @@
 
 - name: Flush handlers
   meta: flush_handlers
+
+#- name: Install pymysql python module
+#  pip:
+#    name: pymysql
+#    executable: pip3
+
+- name: Install pymysql pip module
+  shell: |
+    set -o pipefail
+    {{ ansible_python.executable }} -m pip install PyMySQL
+  args:
+    executable: /bin/bash
+  changed_when: False
