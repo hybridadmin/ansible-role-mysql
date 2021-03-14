@@ -11,7 +11,6 @@
     - DELETE FROM mysql.user WHERE User=''
   register: remove_anonymous_user
   changed_when: remove_anonymous_user.stdout != 'COMPLETED'
-  when: mysql_install_settings.harden_security| bool
 
 - name: Disallow root login remotely
   shell: >
@@ -24,7 +23,6 @@
     - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
   register: disallow_remote_root
   changed_when: disallow_remote_root.stdout != 'COMPLETED'
-  when: mysql_install_settings.harden_security| bool
 
 - name: Remove test database and access to it
   shell: >
@@ -38,7 +36,6 @@
     - DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'
   register: remove_test_database
   changed_when: remove_test_database.stdout != 'COMPLETED'
-  when: mysql_install_settings.harden_security| bool
 
 - name: set root password and flush privileges
   shell: >
@@ -51,9 +48,9 @@
     - ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_install_settings.root_password }}'; FLUSH PRIVILEGES;
   register: set_root_password
   changed_when: set_root_password.stdout != 'COMPLETED'
-  when: mysql_install_settings.root_password|length > 0 and mysql_install_settings.harden_security| bool
+  when: mysql_install_settings.root_password|length > 0
 
-- name: selinux - Allow mysql to listen on tcp port {{ mysql_conf_settings.port }}
+- name: selinux - change mysql port to {{ mysql_conf_settings.port }}
   seport:
     ports: "{{ mysql_conf_settings.port }}"
     proto: tcp
