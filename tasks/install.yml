@@ -15,16 +15,6 @@
 - name: Flush handlers
   meta: flush_handlers
 
-###
-- name: check mysqld error log
-  shell: |
-    set -o pipefail
-    journalctl -xe | grep -E "mysqld|mariadb"
-  args:
-    executable: /bin/bash
-  changed_when: False
-###
-
 ## https://www.percona.com/doc/percona-xtradb-cluster/LATEST/howtos/crash-recovery.html
 - name: disable bootstrapping on master node
   lineinfile:
