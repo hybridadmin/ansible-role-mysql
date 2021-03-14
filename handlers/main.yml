@@ -61,6 +61,7 @@
     creates: "/var/lib/mysql/grastate.dat"
   become: true
   changed_when: false
+  ignore_errors: yes
   when: galera_cluster_settings.enabled | bool
 
 - name: start mysql service
