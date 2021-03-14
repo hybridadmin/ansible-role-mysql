@@ -4,7 +4,7 @@
 mysql_install_settings:
   use_mariadb: true
   version: 10.4
-  root_password: ''
+  root_password: 'testPass01'
 
 # configuration settings
 mysql_conf_settings:
