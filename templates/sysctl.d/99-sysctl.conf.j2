@@ -5,7 +5,9 @@ vm.swappiness=0
 
 {% if ansible_kernel.split('.') > '4.8'.split('.') %}
 # Fix it on Linux by enabling BBR TCP congestion control.
+{% if not ansible_virtualization_type | regex_search("docker|container") %}
 net.core.default_qdisc=fq
+{% endif %}
 net.ipv4.tcp_congestion_control=bbr
 {% endif %}
 
