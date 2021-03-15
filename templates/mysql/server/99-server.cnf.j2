@@ -1,4 +1,3 @@
-# https://www.percona.com/blog/2020/06/30/mysql-101-parameters-to-tune-for-mysql-performance/
 [client]
 port            = {{ mysql_conf_settings.port }}
 socket          = {{ mysql_conf_settings.socket }}
@@ -83,6 +82,11 @@ max_binlog_size         = 100M
 {% endif %}
 
 # InnoDB settings.
+{% if galera_cluster_settings.enabled | bool %}
+default_storage_engine=InnoDB
+innodb_doublewrite=1
+{% endif %}
+
 innodb_file_per_table = {{ mysql_conf_settings.innodb_file_per_table }}
 innodb_buffer_pool_size = {{ mysql_conf_settings.innodb_buffer_pool_size }}
 innodb_log_file_size = {{ mysql_conf_settings.innodb_log_file_size }}
@@ -94,6 +98,23 @@ innodb_autoinc_lock_mode = {{ mysql_conf_settings.innodb_autoinc_lock_mode }}
 innodb_thread_concurrency = {{ mysql_conf_settings.innodb_thread_concurrency }}
 innodb_stats_on_metadata = {{ mysql_conf_settings.innodb_stats_on_metadata }}
 innodb_buffer_pool_instances = {{ mysql_conf_settings.innodb_buffer_pool_instances }}
+
+{% if galera_cluster_settings.enabled | bool %}
+# galera cluster settings.
+wsrep_on=ON
+wsrep_provider_options="{{ galera_cluster_settings.wsrep_provider_options }}"
+wsrep_cluster_name="{{ galera_cluster_settings.wsrep_cluster_name }}"
+wsrep_cluster_address=gcomm://{{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}
+{% if ansible_os_family == 'Debian' %}
+wsrep_provider=/usr/lib/galera/libgalera_smm.so
+{% else %}
+wsrep_provider=/usr/lib64/galera-{{ galera_version }}/libgalera_smm.so
+{% endif %}
+#wsrep_sst_method=mariabackup
+#wsrep_sst_auth=cluster_backup_user:P455w0rd
+wsrep_sst_method={{ galera_cluster_settings.wsrep_sst_method }}
+wsrep_node_address={{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}
+{% endif %}
 
 [mysqldump]
 quick
