@@ -1,4 +1,5 @@
 ## mysql
+[![CI](https://github.com/hybridadmin/ansible-role-mysql/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/hybridadmin/ansible-role-mysql/actions/workflows/build.yml)
 
 > A role to install standalone or clustered mysql/mariadb servers on supported distros.
 
