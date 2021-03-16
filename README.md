@@ -13,12 +13,12 @@ The variables below can be edited in [`defaults/main.yml`](defaults/main.yml) to
 
 
 ### MySQL installation settings
-```yaml
-mysql_install_settings:
-  use_mariadb: false
-  version: 8.0
-  root_password: ''
-```
+
+    mysql_install_settings:
+      use_mariadb: false
+      version: 8.0
+      root_password: ''
+
 
 ### Configuration settings
 ```yaml
