@@ -5,5 +5,4 @@
 
     - name: "Include hybridadmin.mysql"
       include_role:
-        #name: "hybridadmin.mysql"
-        name: "ansible-role-mysql"
+        name: "hybridadmin.mysql"
