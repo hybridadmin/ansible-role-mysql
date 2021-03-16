@@ -101,7 +101,7 @@ None.
          - { role: hybridadmin.mysql }
 ```
 
-### Standalone Mariadb 1.04 server:
+### Standalone Mariadb 10.4 server:
 
 ```yaml
     - hosts: servers
@@ -113,7 +113,7 @@ None.
          - { role: hybridadmin.mysql }
 ```
 
-### MySQL Galera Cluster (MySQL 5.7):
+### MySQL Galera Cluster (MySQL Version 5.7):
 
 ```yaml
     - hosts: servers
@@ -128,14 +128,14 @@ None.
          - { role: hybridadmin.mysql }
 ```
 
-### Mariadb Galera cluster (Mariadb 10.4):
+### Mariadb Galera cluster (Mariadb Version 10.4):
 
 ```yaml
     - hosts: servers
       vars:
         mysql_install_settings:
-          use_mariadb: false
-          version: 8.0
+          use_mariadb: true
+          version: 10.4
         galera_cluster_settings:
           enabled: true
           wsrep_sst_method: rsync
