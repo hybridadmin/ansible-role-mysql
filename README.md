@@ -15,17 +15,16 @@ None.
 
 ## Role Variables
 
-The variables that can be set are listed below and default values are provided as well [`defaults/main.yml`](defaults/main.yml):
+The variables that can be set are listed below and default values are provided in [`defaults/main.yml`](defaults/main.yml):
 
     mysql_install_settings:
       use_mariadb: false
       version: 8.0
       root_password: ''
 
-Installation settings specific to the mysql deployment should be provided here. `use_mariadb` is used choose between
- mysql or mariadb and `version` specifes the desired mysql/mariadb version to be installed ( i.e mysql `5.7`, `5.7` or `8.0` or mariadb `10.3`+)
+The instance installation settings that are used for either `mysql` or `mariadb` are specified here. `use_mariadb` is used to choose between
+`mysql` or `mariadb`. `version` specifes the desired mysql/mariadb version to be installed ( i.e mysql `5.7`, `5.7` or `8.0` or mariadb `10.3`+)
 
-### Configuration settings
 
     mysql_conf_settings:
       port: 3306
@@ -70,8 +69,8 @@ Installation settings specific to the mysql deployment should be provided here. 
       innodb_stats_on_metadata: "OFF"
       innodb_buffer_pool_instances: 1
 
+The configuration settings for the `mysql`/`mariadb` instance are specifed here. These settings will be saved to `/etc/mysql/conf.d/server.cnf` on `debian` and `/etc/my.cnf.d/server.cnf` on `redhat` distros.
 
-### Cluster installation settings
 
     galera_cluster_settings:
       enabled: true
@@ -80,6 +79,8 @@ Installation settings specific to the mysql deployment should be provided here. 
       wsrep_cluster_name: "GaleraCluster"
       wsrep_sst_user: "mariabackup"
       wsrep_sst_pass: "tstwytw22211"
+
+The `galera` cluster configuration settings are specified here.
 
 
 ## Dependencies

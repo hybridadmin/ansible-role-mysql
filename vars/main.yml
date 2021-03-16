@@ -165,24 +165,6 @@ mysql_conf_templates:
   - { src: "mysql/server/{{ mysql_server_type }}.my.cnf.j2", dest: "{{ mysql_conf.file_path }}" }
   - { src: "mysql/server/99-server.cnf.j2", dest: "{{ mysql_conf.include_dir }}/server.cnf" }
 
-#_mysql_conf_files:
-#  mycnf:
-#    mariadb:
-#      - { src: "mysql/server/mariadb.my.cnf.j2", dest: "{{ mysql_conf.file_path }}" }
-#    mysql:
-#      - { src: "mysql/server/mysql.my.cnf.j2", dest: "{{ mysql_conf.file_path }}" }
-#  server:
-#    - { src: "mysql/server/99-server.cnf.j2", dest: "{{ mysql_conf.include_dir }}/server.cnf" }
-#  mysql_galera:
-#    - { src: "mysql/galera/99-galera-cluster.cnf", dest: "{{ mysql_conf.include_dir }}/galera.cnf" }
-
-#mysql_conf_templates: |
-#     {% if galera_cluster_settings.enabled | bool %}
-#     {{ _mysql_conf_files['mysql_galera'] + _mysql_conf_files['mycnf'][mysql_server_type] }}
-#     {% else %}
-#     {{ _mysql_conf_files['server'] + _mysql_conf_files['mycnf'][mysql_server_type] }}
-#     {% endif%}
-
 _mysql_dir_list:
   - "/var/run/mysqld"
 mysql_dir_list: "{% if mysql_conf_settings.log_error | length > 0 %}{{ _mysql_dir_list + [''+ mysql_conf_settings.log_error | dirname] }}{% else %}{{ _mysql_dir_list + ['/var/log/mysql'] }}{% endif %}"
