@@ -15,16 +15,15 @@ None.
 
 ## Role Variables
 
-The variables below can be edited in [`defaults/main.yml`](defaults/main.yml) to customize the deployment:
-
-
-### MySQL installation settings
+The variables that can be set are listed below and default values are provided as well [`defaults/main.yml`](defaults/main.yml):
 
     mysql_install_settings:
       use_mariadb: false
       version: 8.0
       root_password: ''
 
+Installation settings specific to the mysql deployment should be provided here. `use_mariadb` is used choose between
+ mysql or mariadb and `version` specifes the desired mysql/mariadb version to be installed ( i.e mysql `5.7`, `5.7` or `8.0` or mariadb `10.3`+)
 
 ### Configuration settings
 
