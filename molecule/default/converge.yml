@@ -1,12 +1,8 @@
 ---
 - name: Converge
   hosts: all
+  tasks:
 
-  roles:
-    - role: hybridadmin.mysql
-
-#  tasks:
-
-#    - name: "Include hybridadmin.mysql"
-#      include_role:
-#        name: "hybridadmin.mysql"
+    - name: "Include hybridadmin.mysql"
+      include_role:
+        name: "hybridadmin.mysql"
