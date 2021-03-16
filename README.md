@@ -3,6 +3,12 @@
 
 > A role to install standalone or clustered mysql/mariadb servers on supported distros.
 
+The galera cluster options depending on whether `mysql` or `mariadb` is required are as below:
+
+* [`Galera Cluster for MySQL`](https://galeracluster.com/library/documentation/install-mysql.html)
+* [`MariaDB Galera Cluster`](https://galeracluster.com/library/documentation/install-mariadb.html)
+
+
 ## Requirements
 
 None.
@@ -83,10 +89,56 @@ None.
 
 ## Example Playbook
 
-An example playbook is included below:
+### Standalone MySQL 8.0 server:
 
 ```yaml
     - hosts: servers
+      vars:
+        mysql_install_settings:
+          use_mariadb: false
+          version: 8.0
+      roles:
+         - { role: hybridadmin.mysql }
+```
+
+### Standalone Mariadb 1.04 server:
+
+```yaml
+    - hosts: servers
+      vars:
+        mysql_install_settings:
+          use_mariadb: true
+          version: 10.4
+      roles:
+         - { role: hybridadmin.mysql }
+```
+
+### MySQL Galera Cluster (MySQL 5.7):
+
+```yaml
+    - hosts: servers
+      vars:
+        mysql_install_settings:
+          use_mariadb: false
+          version: 5.7
+        galera_cluster_settings:
+          enabled: true
+          wsrep_sst_method: rsync
+      roles:
+         - { role: hybridadmin.mysql }
+```
+
+### Mariadb Galera cluster (Mariadb 10.4):
+
+```yaml
+    - hosts: servers
+      vars:
+        mysql_install_settings:
+          use_mariadb: false
+          version: 8.0
+        galera_cluster_settings:
+          enabled: true
+          wsrep_sst_method: rsync
       roles:
          - { role: hybridadmin.mysql }
 ```
