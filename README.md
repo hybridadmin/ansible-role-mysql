@@ -83,6 +83,7 @@ The configuration settings for the `mysql`/`mariadb` instance are specifed here.
 The `galera` cluster configuration settings are specified here.
 
 
+
 ## Dependencies
 
 None.
@@ -101,7 +102,7 @@ None.
          - { role: hybridadmin.mysql }
 ```
 
-### Standalone Mariadb 10.4 server:
+### Standalone MariaDB 10.4 server:
 
 ```yaml
     - hosts: servers
@@ -113,7 +114,7 @@ None.
          - { role: hybridadmin.mysql }
 ```
 
-### MySQL Galera Cluster (MySQL Version 5.7):
+### MySQL Galera Cluster (MySQL 5.7):
 
 ```yaml
     - hosts: servers
@@ -128,7 +129,7 @@ None.
          - { role: hybridadmin.mysql }
 ```
 
-### Mariadb Galera cluster (Mariadb Version 10.4):
+### MariaDB Galera cluster (MariaDB 10.4):
 
 ```yaml
     - hosts: servers
