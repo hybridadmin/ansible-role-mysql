@@ -15,16 +15,6 @@
 - name: Flush handlers
   meta: flush_handlers
 
-## https://www.percona.com/doc/percona-xtradb-cluster/LATEST/howtos/crash-recovery.html
-- name: disable bootstrapping on master node
-  lineinfile:
-    path: "/var/lib/mysql/grastate.dat"
-    regexp: "{{ item }}"
-    line: "safe_to_bootstrap: 0"
-  with_items:
-    - "(safe.*trap.*\\d{1})"
-  when: galera_cluster_settings.enabled | bool
-
 # sst fix after bootstrap TBC
 #- name: create cluster sst user
 #  shell: |
@@ -38,16 +28,16 @@
 #  changed_when: False
 #  when: wsrep_sst_method == 'mariabackup'
 
-#- name: Check master node is UP
-#  wait_for:
-#    host: "localhost"
-#    port: "33069"
-#    delay: 5
-#    timeout: 300
-#    state: started
-#    msg: "Master is not yet UP"
-#  register: master_is_up
-#  connection: local
-#  when: galera_cluster_settings.enabled | bool
+- name: Check master node is UP
+  wait_for:
+    host: "localhost"
+    port: "3306"
+    delay: 5
+    timeout: 300
+    state: started
+    msg: "Master is not yet UP"
+  register: master_is_up
+  connection: local
+  when: galera_cluster_settings.enabled | bool
 
 # start mysql on slave nodes
