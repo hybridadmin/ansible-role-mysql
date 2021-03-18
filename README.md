@@ -25,7 +25,7 @@ The variables that can be set are listed below and default values are provided i
       root_password: ''
 
 The instance installation settings that are used for either `mysql` or `mariadb` are specified here. `use_mariadb` is used to choose between
-`mysql` or `mariadb`. `version` specifes the desired mysql/mariadb version to be installed ( i.e mysql `5.7`, `5.7` or `8.0` or mariadb `10.3`+)
+`mysql` or `mariadb`. `version` specifies the `mysql` or `mariadb` version to be installed ( i.e mysql `5.6`+ or mariadb `10.3`+)
 
 
     mysql_conf_settings:
