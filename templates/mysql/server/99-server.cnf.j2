@@ -110,9 +110,14 @@ wsrep_provider=/usr/lib/galera/libgalera_smm.so
 {% else %}
 wsrep_provider=/usr/lib64/galera-{{ galera_version }}/libgalera_smm.so
 {% endif %}
-#wsrep_sst_method=mariabackup
-#wsrep_sst_auth=cluster_backup_user:P455w0rd
+wsrep_slave_threads = {{ ansible_processor_vcpus * 2 }}
 wsrep_sst_method={{ galera_cluster_settings.wsrep_sst_method }}
+{% if not 'rsync' in galera_cluster_settings.wsrep_sst_method %}
+{% if galera_cluster_settings.wsrep_sst_user is defined %}
+wsrep_sst_method={{ galera_cluster_settings.wsrep_sst_method }}
+wsrep_sst_auth={{ galera_cluster_settings.wsrep_sst_user }}:{{ galera_cluster_settings.wsrep_sst_pass }}
+{% endif %}
+{% endif %}
 wsrep_node_address={{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}
 {% endif %}
 
