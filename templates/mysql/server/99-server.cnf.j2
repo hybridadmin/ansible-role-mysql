@@ -29,20 +29,17 @@ log-error = {{ mysql_conf_settings.log_error }}
 {% else %}
 log-error = /var/log/mysql/mysql.log
 {% endif %}
-
 {% if not mysql_install_settings.use_mariadb | bool and mysql_install_settings.version is version('8.0', '>=') %}
 log_error_verbosity = 2
 {% else %}
 log_warnings = 2
 {% endif %}
-
 {% if mysql_conf_settings.slow_query_log_file| int > 0 %}
 # Slow query log configuration.
 slow_query_log = 1
 slow_query_log_file = {{ mysql_conf_settings.slow_query_log_file }}
 long_query_time = {{ mysql_conf_settings.slow_query_time }}
 {% endif %}
-
 {% if  mysql_install_settings.version is version('5.7', '<=') %}
 # Disabling symbolic-links is recommended to prevent assorted security risks
 symbolic-links = 0
