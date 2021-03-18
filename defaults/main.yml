@@ -55,5 +55,5 @@ galera_cluster_settings:
   wsrep_sst_method: rsync
   wsrep_sst_user: "mariabackup"
   wsrep_sst_pass: "tstwytw22211"
-  wsrep_provider_options: "gcache.size=300M; gcache.page_size=300M"
+  wsrep_provider_options: "gcache.recover=yes; gcache.size=1G; gcache.page_size=1G"
   wsrep_cluster_name: "GaleraCluster"
