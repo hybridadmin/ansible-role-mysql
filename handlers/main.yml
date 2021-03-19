@@ -43,26 +43,26 @@
     - "(^pid-file.*)"
   when: ansible_os_family == 'Debian'
 
-- name: mysqld bootstrap fix for logging
-  file:
-    path: /var/log/mysql/mysql.log
-    owner: mysql
-    group: root
-    state: touch
-    mode: '0755'
-  when: galera_cluster_settings.enabled | bool
+#- name: mysqld bootstrap fix for logging
+#  file:
+#    path: /var/log/mysql/mysql.log
+#    owner: mysql
+#    group: root
+#    state: touch
+#    mode: '0755'
+#  when: galera_cluster_settings.enabled | bool
 
-- name: cluster master bootstrap
-  shell: |
-    set -o pipefail
-    {{ cluster_bootstrap_cmd }}
-  args:
-    executable: /bin/bash
-    creates: "/var/lib/mysql/grastate.dat"
-  become: true
-  changed_when: false
-  ignore_errors: yes
-  when: galera_cluster_settings.enabled | bool
+#- name: cluster master bootstrap
+#  shell: |
+#    set -o pipefail
+#    {{ cluster_bootstrap_cmd }}
+#  args:
+#    executable: /bin/bash
+#    creates: "/var/lib/mysql/grastate.dat"
+#  become: true
+#  changed_when: false
+#  ignore_errors: yes
+#  when: galera_cluster_settings.enabled | bool
 
 - name: start mysql service
   systemd:

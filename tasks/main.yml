@@ -6,7 +6,9 @@
 
 - include: install.yml
 
+- include: galera.yml
+  when: (galera_cluster_settings.enabled | bool)
+
 - include: secure-mysql.yml
-#  when: not (galera_cluster_settings.enabled | bool)
 
 - include: configure.yml

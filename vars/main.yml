@@ -70,6 +70,10 @@ _mysql_conf:
 
 mysql_conf: "{{ _mysql_conf[ansible_os_family][mysql_server_type] }}"
 
+mysql_conf_templates:
+  - { src: "mysql/server/{{ mysql_server_type }}.my.cnf.j2", dest: "{{ mysql_conf.file_path }}" }
+  - { src: "mysql/server/99-server.cnf.j2", dest: "{{ mysql_conf.include_dir }}/server.cnf" }
+
 # repo configuration
 _mysql_repo_file_mapping:
   Debian:
@@ -160,10 +164,6 @@ cluster_bootstrap_cmd: |
      {% else %}
      /usr/bin/mysqld_bootstrap
      {% endif %}
-
-mysql_conf_templates:
-  - { src: "mysql/server/{{ mysql_server_type }}.my.cnf.j2", dest: "{{ mysql_conf.file_path }}" }
-  - { src: "mysql/server/99-server.cnf.j2", dest: "{{ mysql_conf.include_dir }}/server.cnf" }
 
 _mysql_dir_list:
   - "/var/run/mysqld"

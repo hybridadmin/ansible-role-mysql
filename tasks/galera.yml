@@ -1,0 +1,63 @@
+---
+
+#- name: stop mysql before bootstrap
+#  systemd:
+#    state: stopped
+#    name: "{{ mysql_service_daemon }}"
+#    enabled: yes
+
+#- name: add cluster configuration
+#  template:
+#    src: "{{ item.src }}"
+#    dest: "{{ item.dest }}"
+#    mode: 0644
+#    backup: yes
+#  with_items:
+#    - "{{ cluster_conf_templates }}"
+
+- name: mysqld bootstrap fix for logging
+  file:
+    path: /var/log/mysql/mysql.log
+    owner: mysql
+    group: root
+    state: touch
+    mode: '0755'
+  changed_when: false
+
+- name: cluster master bootstrap
+  shell: |
+    set -o pipefail
+    {{ cluster_bootstrap_cmd }}
+  args:
+    executable: /bin/bash
+    creates: "/var/lib/mysql/grastate.dat"
+  become: true
+  changed_when: false
+  ignore_errors: yes
+
+# sst fix after bootstrap TBC
+#- name: create cluster sst user
+#  shell: |
+#    set -o pipefail
+#    mysql -ne "{{ item }}"
+#  args:
+#    executable: /bin/bash
+#  with_items:
+#    - CREATE USER '{{ wsrep_sst_user }}'@'localhost' IDENTIFIED BY '{{ wsrep_sst_pass }}';
+#    - GRANT RELOAD, PROCESS, LOCK TABLES, REPLICATION CLIENT ON *.* TO '{{ wsrep_sst_user }}'@'localhost';
+#  changed_when: False
+#  when: wsrep_sst_method == 'mariabackup'
+
+- name: Check master node is UP
+  wait_for:
+    host: "localhost"
+    port: "3306"
+    delay: 5
+    timeout: 300
+    state: started
+    msg: "Master is not yet UP"
+  register: master_is_up
+  connection: local
+#  changed_when: not 'started' in master_is_up.state
+
+# start mysql on slave nodes
