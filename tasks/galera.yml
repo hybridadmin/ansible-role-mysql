@@ -1,21 +1,12 @@
 ---
 
-#- name: stop mysql before bootstrap
-#  systemd:
-#    state: stopped
-#    name: "{{ mysql_service_daemon }}"
-#    enabled: yes
+- name: stop mysql before bootstrap
+  systemd:
+    state: stopped
+    name: "{{ mysql_service_daemon }}"
+    enabled: yes
 
-#- name: add cluster configuration
-#  template:
-#    src: "{{ item.src }}"
-#    dest: "{{ item.dest }}"
-#    mode: 0644
-#    backup: yes
-#  with_items:
-#    - "{{ cluster_conf_templates }}"
-
-- name: mysqld bootstrap fix for logging
+- name: cluster bootstrap fix
   file:
     path: /var/log/mysql/mysql.log
     owner: mysql
@@ -35,29 +26,42 @@
   changed_when: false
   ignore_errors: yes
 
-# sst fix after bootstrap TBC
-#- name: create cluster sst user
-#  shell: |
-#    set -o pipefail
-#    mysql -ne "{{ item }}"
-#  args:
-#    executable: /bin/bash
-#  with_items:
-#    - CREATE USER '{{ wsrep_sst_user }}'@'localhost' IDENTIFIED BY '{{ wsrep_sst_pass }}';
-#    - GRANT RELOAD, PROCESS, LOCK TABLES, REPLICATION CLIENT ON *.* TO '{{ wsrep_sst_user }}'@'localhost';
-#  changed_when: False
-#  when: wsrep_sst_method == 'mariabackup'
-
-- name: Check master node is UP
+- name: Check node is accepting mysql connections
   wait_for:
     host: "localhost"
     port: "3306"
     delay: 5
     timeout: 300
     state: started
-    msg: "Master is not yet UP"
-  register: master_is_up
+    msg: "Node is now accepting mysql connections"
   connection: local
-#  changed_when: not 'started' in master_is_up.state
+
+#- name: Check master node is UP
+#  wait_for:
+#    host: "localhost"
+#    port: "3306"
+#    delay: 5
+#    timeout: 300
+#    state: started
+#    msg: "Master is not yet UP"
+#  register: master_is_up
+#  connection: local
 
 # start mysql on slave nodes
+
+# sst fix after bootstrap TBC
+- name: create cluster sst user
+  shell: >
+    set -o pipefail
+    mysql -ne "{{ item }}"
+    && echo -n COMPLETED
+  args:
+    executable: /bin/bash
+  with_items:
+    - "{{ cluster_sstuser_query }}FLUSH PRIVILEGES;"
+#    - "FLUSH PRIVILEGES;"
+#    - CREATE USER '{{ galera_cluster_settings.wsrep_sst_user }}'@'localhost' IDENTIFIED BY '{{ galera_cluster_settings.wsrep_sst_pass }}';
+#    - GRANT RELOAD, PROCESS, LOCK TABLES, REPLICATION CLIENT ON *.* TO '{{ galera_cluster_settings.wsrep_sst_user }}'@'localhost';
+  register: create_cluster_sst_user
+  changed_when: create_cluster_sst_user.stdout != 'COMPLETED'
+  when: not 'rsync' in galera_cluster_settings.wsrep_sst_method and (galera_cluster_settings.wsrep_sst_user is defined)

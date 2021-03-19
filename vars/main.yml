@@ -165,6 +165,8 @@ cluster_bootstrap_cmd: |
      /usr/bin/mysqld_bootstrap
      {% endif %}
 
+cluster_sstuser_query: "GRANT RELOAD, PROCESS, LOCK TABLES, REPLICATION CLIENT ON *.* TO '{{ galera_cluster_settings.wsrep_sst_user }}'@'localhost' IDENTIFIED BY '{{ galera_cluster_settings.wsrep_sst_pass }}';"
+
 _mysql_dir_list:
   - "/var/run/mysqld"
 mysql_dir_list: "{% if mysql_conf_settings.log_error | length > 0 %}{{ _mysql_dir_list + [''+ mysql_conf_settings.log_error | dirname] }}{% else %}{{ _mysql_dir_list + ['/var/log/mysql'] }}{% endif %}"
