@@ -9,6 +9,7 @@
     - add custom configuration files
     - fix config in /etc/mysql/mysql.conf.d/mysqld.cnf
     - start mysql service
+    - redhat - start mysql service
 
 - name: Flush handlers
   meta: flush_handlers

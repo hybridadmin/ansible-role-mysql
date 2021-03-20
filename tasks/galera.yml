@@ -27,6 +27,7 @@
     - "{{ mysql_conf_templates }}"
   notify:
     - stop mysql before bootstrap
+    - redhat - stop mysql before bootstrap
 
 - name: Flush handlers
   meta: flush_handlers
@@ -43,7 +44,6 @@
 - name: cluster master bootstrap
   shell: |
     set -o pipefail
-    rm -rf  /var/lib/mysql/mysql_upgrade_info
     {{ cluster_bootstrap_cmd }}
   args:
     executable: /bin/bash

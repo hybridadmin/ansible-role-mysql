@@ -1,5 +1,19 @@
 ---
 
+- name: enable mysql general logging
+  shell: >
+    set -o pipefail
+    mysql -ne "{{ item }}"
+    && echo -n COMPLETED
+  args:
+    executable: /bin/bash
+  with_items:
+    - SET GLOBAL general_log_file='/var/log/mysql/queries.log';
+    - SET GLOBAL log_output = 'FILE';
+    - SET GLOBAL general_log = 1;
+  register: enable_general_logging
+  changed_when: enable_general_logging.stdout != 'COMPLETED'
+
 - name: Remove anonymous users
   shell: >
     set -o pipefail

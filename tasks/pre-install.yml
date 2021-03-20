@@ -1,5 +1,42 @@
 ---
 
+- name: os configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    force: yes
+  loop: "{{ config_templates }}"
+  register: config_files
+
+- name: Increase max open files for system/users
+  lineinfile:
+    path: "{{ item.name }}"
+    regexp: "DefaultLimitNOFILE"
+    line: DefaultLimitNOFILE=256000:1000000
+    state: present
+  loop:
+    - { name: "/etc/systemd/system.conf" }
+    - { name: "/etc/systemd/user.conf" }
+
+- name: Reload sysctl
+  shell: |
+    set -o pipefail
+    sysctl -p /etc/sysctl.d/99-sysctl.conf
+  args:
+      executable: /bin/bash
+  become: true
+  changed_when: false
+  ignore_errors: yes
+
+- name: add noatime option for improved fs performance
+  replace:
+    backup: yes
+    path: /etc/fstab
+    regexp: '^(\S+)(\s+)(\S+)(\s+)(ext4|xfs)(\s+)(((?!noatime)\S)*)(\s+)(\d)(\s+)(\d)$'
+    replace: '\1\2\3\4\5\6\7,noatime\9\10\11\12'
+  when: not ansible_virtualization_type | regex_search("docker|container")
+
 - name: selinux permissive mode for Cluster traffic
   seport:
     ports: "{{ item.port }}"

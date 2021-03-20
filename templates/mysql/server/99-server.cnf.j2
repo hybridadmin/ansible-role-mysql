@@ -102,6 +102,8 @@ wsrep_on=ON
 wsrep_provider_options="{{ galera_cluster_settings.wsrep_provider_options }}"
 wsrep_cluster_name="{{ galera_cluster_settings.wsrep_cluster_name }}"
 wsrep_cluster_address=gcomm://{{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}
+wsrep_node_address={{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}
+wsrep_node_name={{ ansible_hostname }}
 {% if ansible_os_family == 'Debian' %}
 wsrep_provider=/usr/lib/galera/libgalera_smm.so
 {% else %}
@@ -115,7 +117,6 @@ wsrep_sst_method=rsync
 # wsrep_sst_auth={{ galera_cluster_settings.wsrep_sst_user }}:{{ galera_cluster_settings.wsrep_sst_pass }}
 # {% endif %}
 # {% endif %}
-wsrep_node_address={{ ansible_default_ipv4.address|default(ansible_all_ipv4_addresses[0]) }}
 {% endif %}
 
 [mysqldump]

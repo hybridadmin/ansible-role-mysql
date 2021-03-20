@@ -2,13 +2,23 @@
 
 - include: repo-setup.yml
 
+#- include: configure.yml
+
 - include: pre-install.yml
 
 - include: install.yml
 
+- include: secure-mysql.yml
+
 - include: galera.yml
   when: (galera_cluster_settings.enabled | bool)
 
-- include: secure-mysql.yml
+#- include: secure-mysql.yml
 
-- include: configure.yml
+- name: read /var/log/mysql/queries.log
+  shell: >
+    set -o pipefail
+    cat /var/log/mysql/queries.log
+  args:
+    executable: /bin/bash
+  changed_when: False
