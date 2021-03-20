@@ -1,10 +1,35 @@
 ---
 
-- name: stop mysql before bootstrap
-  systemd:
-    state: stopped
-    name: "{{ mysql_service_daemon }}"
-    enabled: yes
+# sst fix after bootstrap TBC
+- name: create cluster sst user
+  shell: >
+    set -o pipefail
+    mysql -ne "{{ item }}"
+    && echo -n COMPLETED
+  args:
+    executable: /bin/bash
+  with_items:
+#    - "{{ cluster_sstuser_query }}FLUSH PRIVILEGES;"
+    - CREATE USER '{{ galera_cluster_settings.wsrep_sst_user }}'@'localhost' IDENTIFIED BY '{{ galera_cluster_settings.wsrep_sst_pass }}';
+    - GRANT RELOAD, PROCESS, LOCK TABLES, REPLICATION CLIENT ON *.* TO '{{ galera_cluster_settings.wsrep_sst_user }}'@'localhost';
+    - FLUSH PRIVILEGES;
+  register: create_cluster_sst_user
+  changed_when: create_cluster_sst_user.stdout != 'COMPLETED'
+  when: not 'rsync' in galera_cluster_settings.wsrep_sst_method and (galera_cluster_settings.wsrep_sst_user is defined)
+
+- name: add cluster configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    backup: yes
+  with_items:
+    - "{{ mysql_conf_templates }}"
+  notify:
+    - stop mysql before bootstrap
+
+- name: Flush handlers
+  meta: flush_handlers
 
 - name: cluster bootstrap fix
   file:
@@ -18,6 +43,7 @@
 - name: cluster master bootstrap
   shell: |
     set -o pipefail
+    rm -rf  /var/lib/mysql/mysql_upgrade_info
     {{ cluster_bootstrap_cmd }}
   args:
     executable: /bin/bash
@@ -48,20 +74,3 @@
 #  connection: local
 
 # start mysql on slave nodes
-
-# sst fix after bootstrap TBC
-- name: create cluster sst user
-  shell: >
-    set -o pipefail
-    mysql -ne "{{ item }}"
-    && echo -n COMPLETED
-  args:
-    executable: /bin/bash
-  with_items:
-    - "{{ cluster_sstuser_query }}FLUSH PRIVILEGES;"
-#    - "FLUSH PRIVILEGES;"
-#    - CREATE USER '{{ galera_cluster_settings.wsrep_sst_user }}'@'localhost' IDENTIFIED BY '{{ galera_cluster_settings.wsrep_sst_pass }}';
-#    - GRANT RELOAD, PROCESS, LOCK TABLES, REPLICATION CLIENT ON *.* TO '{{ galera_cluster_settings.wsrep_sst_user }}'@'localhost';
-  register: create_cluster_sst_user
-  changed_when: create_cluster_sst_user.stdout != 'COMPLETED'
-  when: not 'rsync' in galera_cluster_settings.wsrep_sst_method and (galera_cluster_settings.wsrep_sst_user is defined)

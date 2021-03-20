@@ -2,8 +2,8 @@
 
 # installation settings
 mysql_install_settings:
-  use_mariadb: true
-  version: 10.5
+  use_mariadb: false
+  version: 8.0
   root_password: ''
 
 # configuration settings
@@ -55,5 +55,5 @@ galera_cluster_settings:
   wsrep_sst_method: "mariabackup"
   wsrep_sst_user: "cluster_sstuser"
   wsrep_sst_pass: "tstwytw22211"
-  wsrep_provider_options: "gcache.recover=yes; gcache.size=1G; gcache.page_size=1G"
+  wsrep_provider_options: "gcache.recover=yes; gcache.size=128M; gcache.page_size=128M"
   wsrep_cluster_name: "GaleraCluster"

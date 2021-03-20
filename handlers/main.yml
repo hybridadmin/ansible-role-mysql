@@ -30,6 +30,7 @@
     backup: yes
   with_items:
     - "{{ mysql_conf_templates }}"
+  when: not galera_cluster_settings.enabled | bool
 
 - name: fix config in /etc/mysql/mysql.conf.d/mysqld.cnf
   lineinfile:
@@ -42,27 +43,6 @@
     - "(^log-error.*)"
     - "(^pid-file.*)"
   when: ansible_os_family == 'Debian'
-
-#- name: mysqld bootstrap fix for logging
-#  file:
-#    path: /var/log/mysql/mysql.log
-#    owner: mysql
-#    group: root
-#    state: touch
-#    mode: '0755'
-#  when: galera_cluster_settings.enabled | bool
-
-#- name: cluster master bootstrap
-#  shell: |
-#    set -o pipefail
-#    {{ cluster_bootstrap_cmd }}
-#  args:
-#    executable: /bin/bash
-#    creates: "/var/lib/mysql/grastate.dat"
-#  become: true
-#  changed_when: false
-#  ignore_errors: yes
-#  when: galera_cluster_settings.enabled | bool
 
 - name: start mysql service
   systemd:
@@ -77,3 +57,10 @@
   with_items:
     - "/etc/apparmor.d/usr.sbin.mysqld"
   when: ansible_apparmor.status == 'enabled' and mysqld_apparmor_disabled['changed']
+
+- name: stop mysql before bootstrap
+  systemd:
+    state: stopped
+    name: "{{ mysql_service_daemon }}"
+    enabled: yes
+#  changed_when: false
