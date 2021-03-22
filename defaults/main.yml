@@ -2,8 +2,8 @@
 
 # installation settings
 mysql_install_settings:
-  use_mariadb: false
-  version: 8.0
+  use_mariadb: true
+  version: 10.4
   root_password: ''
 
 # configuration settings

@@ -1,20 +1,14 @@
 ---
 
-# sst fix after bootstrap TBC
 - name: create cluster sst user
-  shell: >
-    set -o pipefail
-    mysql -ne "{{ item }}"
-    && echo -n COMPLETED
-  args:
-    executable: /bin/bash
-  with_items:
-#    - "{{ cluster_sstuser_query }}FLUSH PRIVILEGES;"
-    - CREATE USER '{{ galera_cluster_settings.wsrep_sst_user }}'@'localhost' IDENTIFIED BY '{{ galera_cluster_settings.wsrep_sst_pass }}';
-    - GRANT RELOAD, PROCESS, LOCK TABLES, REPLICATION CLIENT ON *.* TO '{{ galera_cluster_settings.wsrep_sst_user }}'@'localhost';
-    - FLUSH PRIVILEGES;
-  register: create_cluster_sst_user
-  changed_when: create_cluster_sst_user.stdout != 'COMPLETED'
+  mysql_user:
+    name: "{{ galera_cluster_settings.wsrep_sst_user }}"
+    password: "{{ galera_cluster_settings.wsrep_sst_pass }}"
+    host: localhost
+    priv: '*.*:RELOAD,PROCESS,LOCK TABLES,REPLICATION CLIENT'
+    state: present
+    login_unix_socket: "{{ mysql_tmp_socket.stdout }}"
+  changed_when: False
   when: not 'rsync' in galera_cluster_settings.wsrep_sst_method and (galera_cluster_settings.wsrep_sst_user is defined)
 
 - name: add cluster configuration files
@@ -27,7 +21,6 @@
     - "{{ mysql_conf_templates }}"
   notify:
     - stop mysql before bootstrap
-    - redhat - stop mysql before bootstrap
 
 - name: Flush handlers
   meta: flush_handlers
@@ -52,7 +45,7 @@
   changed_when: false
   ignore_errors: yes
 
-- name: Check node is accepting mysql connections
+- name: Cluster - Check node is accepting mysql connections
   wait_for:
     host: "localhost"
     port: "3306"

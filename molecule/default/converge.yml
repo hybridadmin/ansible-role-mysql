@@ -3,6 +3,11 @@
   hosts: all
   tasks:
 
+    - name: Install pymysql
+      pip:
+        name: pymysql
+        executable: pip3
+
     - name: "Include hybridadmin.mysql"
       include_role:
         #name: "hybridadmin.mysql"

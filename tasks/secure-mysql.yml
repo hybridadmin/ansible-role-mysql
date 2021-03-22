@@ -1,67 +1,56 @@
 ---
 
-- name: enable mysql general logging
-  shell: >
+- name: get mysql tmp socket
+  shell: |
     set -o pipefail
-    mysql -ne "{{ item }}"
-    && echo -n COMPLETED
+    lsof -c mysql | grep "sock.*STRE" | tail -n1 | awk '{print $9}'
   args:
     executable: /bin/bash
-  with_items:
-    - SET GLOBAL general_log_file='/var/log/mysql/queries.log';
-    - SET GLOBAL log_output = 'FILE';
-    - SET GLOBAL general_log = 1;
-  register: enable_general_logging
-  changed_when: enable_general_logging.stdout != 'COMPLETED'
+  register: mysql_tmp_socket
+  changed_when: False
+
+- name: enable mysql general logging
+  community.mysql.mysql_query:
+    login_unix_socket: "{{ mysql_tmp_socket.stdout }}"
+    login_db: mysql
+    query:
+      - SET GLOBAL general_log_file='/var/log/mysql/queries.log'
+      - SET GLOBAL log_output = 'FILE'
+      - SET GLOBAL general_log = 1
+  changed_when: False
 
 - name: Remove anonymous users
-  shell: >
-    set -o pipefail
-    mysql -ne "{{ item }}"
-    && echo -n COMPLETED
-  args:
-    executable: /bin/bash
-  with_items:
-    - DELETE FROM mysql.user WHERE User=''
-  register: remove_anonymous_user
-  changed_when: remove_anonymous_user.stdout != 'COMPLETED'
+  community.mysql.mysql_query:
+    login_unix_socket: "{{ mysql_tmp_socket.stdout }}"
+    login_db: mysql
+    query:
+      - DELETE FROM mysql.user WHERE User=''
+  changed_when: False
 
 - name: Disallow root login remotely
-  shell: >
-    set -o pipefail
-    mysql -ne "{{ item }}"
-    && echo -n COMPLETED
-  args:
-    executable: /bin/bash
-  with_items:
-    - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
-  register: disallow_remote_root
-  changed_when: disallow_remote_root.stdout != 'COMPLETED'
+  community.mysql.mysql_query:
+    login_unix_socket: "{{ mysql_tmp_socket.stdout }}"
+    login_db: mysql
+    query:
+      - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
+  changed_when: False
 
 - name: Remove test database and access to it
-  shell: >
-    set -o pipefail
-    mysql -ne "{{ item }}"
-    && echo -n COMPLETED
-  args:
-    executable: /bin/bash
-  with_items:
-    - DROP DATABASE IF EXISTS test
-    - DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'
-  register: remove_test_database
-  changed_when: remove_test_database.stdout != 'COMPLETED'
+  community.mysql.mysql_query:
+    login_unix_socket: "{{ mysql_tmp_socket.stdout }}"
+    login_db: mysql
+    query:
+      - DROP DATABASE IF EXISTS test
+      - DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'
+  changed_when: False
 
 - name: set root password and flush privileges
-  shell: >
-    set -o pipefail
-    mysql -ne "{{ item }}"
-    && echo -n COMPLETED
-  args:
-    executable: /bin/bash
-  with_items:
-    - ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_install_settings.root_password }}'; FLUSH PRIVILEGES;
-  register: set_root_password
-  changed_when: set_root_password.stdout != 'COMPLETED'
+  community.mysql.mysql_query:
+    login_unix_socket: "{{ mysql_tmp_socket.stdout }}"
+    login_db: mysql
+    query:
+      - ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_install_settings.root_password }}'; FLUSH PRIVILEGES;
+  changed_when: False
   when: mysql_install_settings.root_password|length > 0
 
 - name: selinux - change mysql port to {{ mysql_conf_settings.port }}

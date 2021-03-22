@@ -9,7 +9,16 @@
     - add custom configuration files
     - fix config in /etc/mysql/mysql.conf.d/mysqld.cnf
     - start mysql service
-    - redhat - start mysql service
 
 - name: Flush handlers
   meta: flush_handlers
+
+- name: Check node is accepting mysql connections
+  wait_for:
+    host: "localhost"
+    port: "3306"
+    delay: 5
+    timeout: 180
+    state: started
+    msg: "Node is now accepting mysql connections"
+  connection: local

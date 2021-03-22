@@ -49,23 +49,6 @@
     state: started
     name: "{{ mysql_service_daemon }}"
     enabled: yes
-  when: not ansible_os_family == 'RedHat'
-#  when: not (galera_cluster_settings.enabled | bool)
-
-# https://github.com/ansible/ansible/issues/71528
-- name: redhat - start mysql service
-  shell: >
-    set -o pipefail
-    {{ item }}
-    && echo -n COMPLETED
-  args:
-    executable: /bin/bash
-  with_items:
-    - systemctl enable {{ mysql_service_daemon }}
-    - systemctl start {{ mysql_service_daemon }}
-  register: start_mysql_service
-  changed_when: start_mysql_service.stdout != 'COMPLETED'
-  when: ansible_os_family == 'RedHat'
 
 - name: apparmor | reload apparmor profiles
   command: "apparmor_parser -R {{ item }}"
@@ -79,16 +62,3 @@
     state: stopped
     name: "{{ mysql_service_daemon }}"
     enabled: yes
-  when: not ansible_os_family == 'RedHat'
-
-# https://github.com/ansible/ansible/issues/71528
-- name: redhat - stop mysql before bootstrap
-  shell: >
-    set -o pipefail
-    systemctl stop {{ mysql_service_daemon }}
-    && echo -n COMPLETED
-  args:
-    executable: /bin/bash
-  register: start_mysql_service
-  changed_when: start_mysql_service.stdout != 'COMPLETED'
-  when: ansible_os_family == 'RedHat'

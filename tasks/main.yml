@@ -16,7 +16,7 @@
 #- include: secure-mysql.yml
 
 - name: read /var/log/mysql/queries.log
-  shell: >
+  shell: |
     set -o pipefail
     cat /var/log/mysql/queries.log
   args:
