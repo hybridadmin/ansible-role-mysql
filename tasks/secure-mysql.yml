@@ -1,43 +1,49 @@
 ---
 
-- name: get mysql tmp socket
+- name: Get mysql socket file
   shell: |
     set -o pipefail
-    lsof -c mysql | grep "sock.*STRE" | tail -n1 | awk '{print $9}'
+    lsof -c mysql | grep -E "\.sock" | awk '{print $9}'
   args:
     executable: /bin/bash
-  register: mysql_tmp_socket
+  register: mysql_socket
   changed_when: False
 
-- name: enable mysql general logging
-  community.mysql.mysql_query:
-    login_unix_socket: "{{ mysql_tmp_socket.stdout }}"
-    login_db: mysql
-    query:
-      - SET GLOBAL general_log_file='/var/log/mysql/queries.log'
-      - SET GLOBAL log_output = 'FILE'
-      - SET GLOBAL general_log = 1
+- name: Create mysql client configuration file
+  template:
+    src: "mysql/client/mysql-client.cnf.j2"
+    dest: "{{ ansible_user_dir }}/.my.cnf"
+    mode: 0600
+  when: ansible_os_family == 'RedHat' and (mysql_install_settings.root_password|length > 0)
+
+- name: Enable mysql general logging
+  mysql_variables:
+    variable: "{{ item.name }}"
+    value: "{{ item.value }}"
+    login_unix_socket: "{{ mysql_socket.stdout }}"
+  with_items:
+    - { name: "general_log_file", value: "/var/log/mysql/queries.log" }
+    - { name: "log_output", value: "FILE" }
+    - { name: "general_log", value: 1 }
   changed_when: False
 
 - name: Remove anonymous users
   community.mysql.mysql_query:
-    login_unix_socket: "{{ mysql_tmp_socket.stdout }}"
+    login_unix_socket: "{{ mysql_socket.stdout }}"
     login_db: mysql
     query:
       - DELETE FROM mysql.user WHERE User=''
-  changed_when: False
 
 - name: Disallow root login remotely
   community.mysql.mysql_query:
-    login_unix_socket: "{{ mysql_tmp_socket.stdout }}"
+    login_unix_socket: "{{ mysql_socket.stdout }}"
     login_db: mysql
     query:
       - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
-  changed_when: False
 
 - name: Remove test database and access to it
   community.mysql.mysql_query:
-    login_unix_socket: "{{ mysql_tmp_socket.stdout }}"
+    login_unix_socket: "{{ mysql_socket.stdout }}"
     login_db: mysql
     query:
       - DROP DATABASE IF EXISTS test
@@ -46,11 +52,10 @@
 
 - name: set root password and flush privileges
   community.mysql.mysql_query:
-    login_unix_socket: "{{ mysql_tmp_socket.stdout }}"
+    login_unix_socket: "{{ mysql_socket.stdout }}"
     login_db: mysql
     query:
       - ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_install_settings.root_password }}'; FLUSH PRIVILEGES;
-  changed_when: False
   when: mysql_install_settings.root_password|length > 0
 
 - name: selinux - change mysql port to {{ mysql_conf_settings.port }}

@@ -4,9 +4,9 @@
   action: >
     {{ ansible_pkg_mgr }} name={{ mysql_package_list }} state=present update_cache=yes
   notify:
-    - initialize mysql
-    - ensure mysqld dirs exist
-    - add custom configuration files
+    - initialize mysql instance
+    - required mysql directories exist
+    - standalone instance configuration files
     - fix config in /etc/mysql/mysql.conf.d/mysqld.cnf
     - start mysql service
 

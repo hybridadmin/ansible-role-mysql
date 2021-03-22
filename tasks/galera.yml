@@ -1,17 +1,18 @@
 ---
 
-- name: create cluster sst user
-  mysql_user:
+- name: cluster state snapshot transfer user
+  community.mysql.mysql_user:
     name: "{{ galera_cluster_settings.wsrep_sst_user }}"
     password: "{{ galera_cluster_settings.wsrep_sst_pass }}"
+#    plugin: "unix_socket"
     host: localhost
     priv: '*.*:RELOAD,PROCESS,LOCK TABLES,REPLICATION CLIENT'
     state: present
-    login_unix_socket: "{{ mysql_tmp_socket.stdout }}"
+    login_unix_socket: "{{ mysql_socket.stdout }}"
   changed_when: False
   when: not 'rsync' in galera_cluster_settings.wsrep_sst_method and (galera_cluster_settings.wsrep_sst_user is defined)
 
-- name: add cluster configuration files
+- name: cluster server configuration files
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"

@@ -18,7 +18,7 @@
 - name: read /var/log/mysql/queries.log
   shell: |
     set -o pipefail
-    cat /var/log/mysql/queries.log
+    if [ -f "/var/log/mysql/queries.log" ]; then cat /var/log/mysql/queries.log; fi
   args:
     executable: /bin/bash
   changed_when: False

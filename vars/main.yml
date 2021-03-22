@@ -74,6 +74,24 @@ mysql_conf_templates:
   - { src: "mysql/server/{{ mysql_server_type }}.my.cnf.j2", dest: "{{ mysql_conf.file_path }}" }
   - { src: "mysql/server/99-server.cnf.j2", dest: "{{ mysql_conf.include_dir }}/server.cnf" }
 
+# mysql unix sockets
+_mysql_socket_file:
+  8.0:
+    Debian: "/var/run/mysqld/mysqld.sock"
+    RedHat: "/var/run/mysqld/mysqlx.sock"
+  5.7:
+    Debian: "/var/lib/mysql/mysql.sock"
+    RedHat: "/var/lib/mysql/mysql.sock"
+  5.6:
+    Debian: "/var/lib/mysql/mysql.sock"
+    RedHat: "/var/lib/mysql/mysql.sock"
+
+_mariadb_socket_file:
+  Debian: "/var/run/mysqld/mysqld.sock"
+  RedHat: "/var/lib/mysql/mysql.sock"
+
+mysql_socket_file: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mariadb_socket_file[ansible_os_family] }}{% else %}{{ _mysql_socket_file[mysql_install_settings.version][ansible_os_family] }}{% endif %}"
+
 # repo configuration
 _mysql_repo_file_mapping:
   Debian:
@@ -164,8 +182,6 @@ cluster_bootstrap_cmd: |
      {% else %}
      /usr/bin/mysqld_bootstrap
      {% endif %}
-
-cluster_sstuser_query: "GRANT RELOAD, PROCESS, LOCK TABLES, REPLICATION CLIENT ON *.* TO '{{ galera_cluster_settings.wsrep_sst_user }}'@'localhost' IDENTIFIED BY '{{ galera_cluster_settings.wsrep_sst_pass }}';"
 
 _mysql_dir_list:
   - "/var/run/mysqld"

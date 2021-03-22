@@ -1,6 +1,6 @@
 ---
 
-- name: initialize mysql
+- name: initialize mysql instance
   shell: |
     set -o pipefail
     mysqld --initialize-insecure --user=mysql --basedir=/usr --datadir=/var/lib/mysql
@@ -10,7 +10,7 @@
   changed_when: false
   when: not (mysql_install_settings.use_mariadb | bool) and ansible_os_family == 'RedHat'
 
-- name: ensure mysqld dirs exist
+- name: required mysql directories exist
   file:
     path: "{{ item }}"
     owner: mysql
@@ -22,7 +22,7 @@
   with_items:
     - "{{ mysql_dir_list }}"
 
-- name: add custom configuration files
+- name: standalone instance configuration files
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
