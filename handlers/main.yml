@@ -32,6 +32,19 @@
     - "{{ mysql_conf_templates }}"
   when: not galera_cluster_settings.enabled | bool
 
+- name: temp mysql socket
+  template:
+    src: "mysql/server/tmp_server.cnf.j2"
+    dest: "{{ mysql_server_cnf }}"
+    mode: 0644
+#  lineinfile:
+#    path: "{{ mysql_server_cnf }}"
+#    regexp: "{{ item.name }}"
+#    insertafter: '\[mysqld\]'
+#    line: "{{ item.value }}"
+#  loop:
+#    - { name: "^((#|)socket=.*)", value: "socket={{ mysql_conf_settings.socket }}" }
+
 - name: fix config in /etc/mysql/mysql.conf.d/mysqld.cnf
   lineinfile:
     path: "/etc/mysql/mysql.conf.d/mysqld.cnf"

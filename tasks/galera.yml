@@ -8,7 +8,7 @@
     host: localhost
     priv: '*.*:RELOAD,PROCESS,LOCK TABLES,REPLICATION CLIENT'
     state: present
-    login_unix_socket: "{{ mysql_socket.stdout }}"
+    login_unix_socket: "{{ mysql_conf_settings.socket }}"
   changed_when: False
   when: not 'rsync' in galera_cluster_settings.wsrep_sst_method and (galera_cluster_settings.wsrep_sst_user is defined)
 

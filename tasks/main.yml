@@ -2,8 +2,6 @@
 
 - include: repo-setup.yml
 
-#- include: configure.yml
-
 - include: pre-install.yml
 
 - include: install.yml
@@ -12,8 +10,6 @@
 
 - include: galera.yml
   when: (galera_cluster_settings.enabled | bool)
-
-#- include: secure-mysql.yml
 
 - name: read /var/log/mysql/queries.log
   shell: |

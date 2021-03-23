@@ -1,12 +1,23 @@
 ---
 - name: Converge
   hosts: all
+#  pre_tasks:
+#    - name: Validate we run with the correct Ansible version
+#      delegate_to: hostvars[inventory_hostname]['ansible_python_version']
+#      assert:
+#        that:
+#          - ansible_version is defined
+#          - ansible_version.full is version('2.7.5.0', '>=')
+#          - ansible_python_version is defined
+#          - ansible_python_version is version('3.9.0', '>=')
+#        fail_msg: "'Python' version must be 3.6.0 and Ansible 2.7.5 minimal version."
+#      run_once: True
   tasks:
 
     - name: Install pymysql
       pip:
         name: pymysql
-        executable: pip3
+        executable: pip
 
     - name: "Include hybridadmin.mysql"
       include_role:

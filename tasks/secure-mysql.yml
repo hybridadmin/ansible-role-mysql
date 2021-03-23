@@ -1,14 +1,5 @@
 ---
 
-- name: Get mysql socket file
-  shell: |
-    set -o pipefail
-    lsof -c mysql | grep -E "\.sock" | awk '{print $9}'
-  args:
-    executable: /bin/bash
-  register: mysql_socket
-  changed_when: False
-
 - name: Create mysql client configuration file
   template:
     src: "mysql/client/mysql-client.cnf.j2"
@@ -16,11 +7,23 @@
     mode: 0600
   when: ansible_os_family == 'RedHat' and (mysql_install_settings.root_password|length > 0)
 
+- name: show ansible info
+  shell: |
+    set -o pipefail
+    ansible --version
+  args:
+    executable: /bin/bash
+  changed_when: False
+
+- name: Show detected python settings
+  debug:
+    msg: " detected python executable is {{ ansible_python.executable }} and detected python version is {{ ansible_python_version }}"
+
 - name: Enable mysql general logging
-  mysql_variables:
+  community.mysql.mysql_variables:
     variable: "{{ item.name }}"
     value: "{{ item.value }}"
-    login_unix_socket: "{{ mysql_socket.stdout }}"
+    login_unix_socket: "{{ mysql_conf_settings.socket }}"
   with_items:
     - { name: "general_log_file", value: "/var/log/mysql/queries.log" }
     - { name: "log_output", value: "FILE" }
@@ -29,21 +32,21 @@
 
 - name: Remove anonymous users
   community.mysql.mysql_query:
-    login_unix_socket: "{{ mysql_socket.stdout }}"
+    login_unix_socket: "{{ mysql_conf_settings.socket }}"
     login_db: mysql
     query:
       - DELETE FROM mysql.user WHERE User=''
 
 - name: Disallow root login remotely
   community.mysql.mysql_query:
-    login_unix_socket: "{{ mysql_socket.stdout }}"
+    login_unix_socket: "{{ mysql_conf_settings.socket }}"
     login_db: mysql
     query:
       - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
 
 - name: Remove test database and access to it
   community.mysql.mysql_query:
-    login_unix_socket: "{{ mysql_socket.stdout }}"
+    login_unix_socket: "{{ mysql_conf_settings.socket }}"
     login_db: mysql
     query:
       - DROP DATABASE IF EXISTS test
@@ -52,7 +55,7 @@
 
 - name: set root password and flush privileges
   community.mysql.mysql_query:
-    login_unix_socket: "{{ mysql_socket.stdout }}"
+    login_unix_socket: "{{ mysql_conf_settings.socket }}"
     login_db: mysql
     query:
       - ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_install_settings.root_password }}'; FLUSH PRIVILEGES;
