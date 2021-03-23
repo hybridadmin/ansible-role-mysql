@@ -17,7 +17,7 @@
     - name: Install pymysql
       pip:
         name: pymysql
-        executable: pip
+        executable: pip3
 
     - name: "Include hybridadmin.mysql"
       include_role:
