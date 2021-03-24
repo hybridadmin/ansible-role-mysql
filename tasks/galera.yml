@@ -55,16 +55,3 @@
     state: started
     msg: "Node is now accepting mysql connections"
   connection: local
-
-#- name: Check master node is UP
-#  wait_for:
-#    host: "localhost"
-#    port: "3306"
-#    delay: 5
-#    timeout: 300
-#    state: started
-#    msg: "Master is not yet UP"
-#  register: master_is_up
-#  connection: local
-
-# start mysql on slave nodes

@@ -1,0 +1,48 @@
+---
+
+- name: selinux permissive mode for Cluster traffic
+  seport:
+    ports: "{{ item.port }}"
+    proto: "{{ item.port }}"
+    setype: mysqld_port_t
+    state: present
+  with_items:
+    - { port: "{{ mysql_conf_settings.port }}", proto: "tcp" }
+    - { port: "4567", proto: "tcp" }
+    - { port: "4567", proto: "udp" }
+    - { port: "4568", proto: "tcp" }
+    - { port: "4444", proto: "tcp" }
+  when: >
+    ansible_selinux is defined and not ansible_selinux | bool and ansible_selinux.status == 'enabled'
+    and ansible_os_family == 'Redhat'
+
+- name: disable SELinux for mysqld
+  selinux_permissive:
+    name: mysqld_t
+    permissive: true
+  when: >
+    ansible_selinux is defined and not ansible_selinux | bool and ansible_selinux.status == 'enabled'
+    and ansible_os_family == 'Redhat'
+
+- name: apparmor - check mysql profile exists
+  stat:
+    path: "/etc/apparmor.d/usr.sbin.mysqld"
+  register: apparmor_profile
+  when: ansible_os_family == 'Debian'
+
+- name: apparmor - disabling profile for mysqld
+  file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    state: link
+    force: "yes"
+  register: mysqld_apparmor_disabled
+  become: true
+  with_items:
+    - { src: "/etc/apparmor.d/usr.sbin.mysqld", dest: "/etc/apparmor.d/disable/usr.sbin.mysqld" }
+  when: ansible_os_family == 'Debian' and apparmor_profile.stat.exists and ansible_apparmor.status == 'enabled'
+  notify:
+    - apparmor | reload apparmor profiles
+
+- name: Flush handlers
+  meta: flush_handlers

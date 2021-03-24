@@ -6,15 +6,9 @@
 
 - include: install.yml
 
+- include: configure.yml
+
 - include: secure-mysql.yml
 
 - include: galera.yml
   when: (galera_cluster_settings.enabled | bool)
-
-- name: read /var/log/mysql/queries.log
-  shell: |
-    set -o pipefail
-    if [ -f "/var/log/mysql/queries.log" ]; then cat /var/log/mysql/queries.log; fi
-  args:
-    executable: /bin/bash
-  changed_when: False
