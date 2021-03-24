@@ -13,12 +13,11 @@ The galera cluster options depending on whether `mysql` or `mariadb` is required
 
 ## Requirements
 
-To be able to use the role successfully the following is required on the ansoible host:
+The following is required on the ansible host:
 * Ansible Collections:
-  - community.mysql
-
+  * [`community.mysql`](https://github.com/ansible-collections/community.mysql)
 * Python packages:
-  - pymsql
+  * [`pymsql`](https://pypi.org/project/PyMySQL/)
 
 ## Role Variables
 
