@@ -111,12 +111,11 @@ wsrep_provider=/usr/lib64/galera-{{ galera_version }}/libgalera_smm.so
 {% endif %}
 wsrep_slave_threads = {{ ansible_processor_vcpus * 2 }}
 wsrep_sst_method=rsync
-# wsrep_sst_method={{ galera_cluster_settings.wsrep_sst_method }}
-# {% if not 'rsync' in galera_cluster_settings.wsrep_sst_method %}
-# {% if galera_cluster_settings.wsrep_sst_user is defined %}
-# wsrep_sst_auth={{ galera_cluster_settings.wsrep_sst_user }}:{{ galera_cluster_settings.wsrep_sst_pass }}
-# {% endif %}
-# {% endif %}
+{% if not 'rsync' in galera_cluster_settings.wsrep_sst_method %}
+{% if galera_cluster_settings.wsrep_sst_user is defined %}
+wsrep_sst_auth={{ galera_cluster_settings.wsrep_sst_user }}:{{ galera_cluster_settings.wsrep_sst_pass }}
+{% endif %}
+{% endif %}
 {% endif %}
 
 [mysqldump]

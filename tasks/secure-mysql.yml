@@ -7,18 +7,6 @@
     mode: 0600
   when: ansible_os_family == 'RedHat' and (mysql_install_settings.root_password|length > 0)
 
-- name: show ansible info
-  shell: |
-    set -o pipefail
-    ansible --version
-  args:
-    executable: /bin/bash
-  changed_when: False
-
-- name: Show detected python settings
-  debug:
-    msg: " detected python executable is {{ ansible_python.executable }} and detected python version is {{ ansible_python_version }}"
-
 - name: Enable mysql general logging
   community.mysql.mysql_variables:
     variable: "{{ item.name }}"

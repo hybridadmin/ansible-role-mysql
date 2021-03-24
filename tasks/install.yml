@@ -7,7 +7,7 @@
     - initialize mysql instance
     - required mysql directories exist
     - standalone instance configuration files
-    - temp mysql socket
+    - temporary mysql configuration
     - fix config in /etc/mysql/mysql.conf.d/mysqld.cnf
     - start mysql service
 
