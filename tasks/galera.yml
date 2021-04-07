@@ -19,7 +19,6 @@
     backup: yes
   with_items:
     - "{{ mysql_conf_templates }}"
-#  changed_when: false
   notify:
     - Stop mysql before bootstrap
 
