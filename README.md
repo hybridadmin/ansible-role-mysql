@@ -104,6 +104,7 @@ None.
         mysql_install_settings:
           use_mariadb: false
           version: 8.0
+          root_password: ''
       roles:
          - { role: hybridadmin.mysql }
 ```
@@ -116,6 +117,7 @@ None.
         mysql_install_settings:
           use_mariadb: true
           version: 10.4
+          root_password: ''
       roles:
          - { role: hybridadmin.mysql }
 ```
@@ -128,6 +130,7 @@ None.
         mysql_install_settings:
           use_mariadb: false
           version: 5.7
+          root_password: ''
         galera_cluster_settings:
           enabled: true
           wsrep_sst_method: rsync
@@ -143,6 +146,7 @@ None.
         mysql_install_settings:
           use_mariadb: true
           version: 10.4
+          root_password: ''
         galera_cluster_settings:
           enabled: true
           wsrep_sst_method: rsync

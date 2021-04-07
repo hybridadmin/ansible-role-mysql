@@ -1,10 +1,10 @@
 ---
 
-- name: install basic packages
+- name: Install basic packages
   action: >
       {{ ansible_pkg_mgr }} name={{ basic_system_packages }} state=present update_cache=yes
 
-- name: create repo file
+- name: Create repository configuration file
   template:
     src: "{{ item.source }}"
     dest: "{{ item.dest }}"
@@ -12,14 +12,14 @@
   with_items:
     - "{{ mysql_repo_file_info }}"
 
-- name: apt-key - debian gpg key
+- name: Import Debian GPG key
   apt_key:
     keyserver: "{{ item.server }}"
     id: "{{ item.fingerprint }}"
   when: ansible_os_family == 'Debian'
   with_items: "{{ apt_gpg_key_info }}"
 
-- name: rpm_key - redhat gpg key
+- name: Import Redhat GPG key
   shell: |
     set -o pipefail
     curl -fsSL {{ item.url }} -o {{ item.dest }}
@@ -32,7 +32,7 @@
   with_items:
     - "{{ rpm_gpg_key_info }}"
 
-- name: redhat - disable mysql mariadb modules
+- name: Disable mysql mariadb modules
   shell: |
     set -o pipefail
     dnf module disable mysql mariadb -qy

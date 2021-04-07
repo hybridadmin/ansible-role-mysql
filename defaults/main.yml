@@ -2,8 +2,8 @@
 
 # installation settings
 mysql_install_settings:
-  use_mariadb: false
-  version: 8.0
+  use_mariadb: true
+  version: 10.5
   root_password: ''
 
 # configuration settings
@@ -51,7 +51,7 @@ mysql_conf_settings:
   innodb_buffer_pool_instances: 1
 
 galera_cluster_settings:
-  enabled: true
+  enabled: false
   wsrep_sst_method: "mariabackup"
   wsrep_sst_user: "cluster_sstuser"
   wsrep_sst_pass: "tstwytw22211"

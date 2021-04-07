@@ -1,6 +1,16 @@
 ---
 
-- name: initialize mysql instance
+- name: Reload sysctl
+  shell: |
+    set -o pipefail
+    sysctl -p /etc/sysctl.d/99-sysctl.conf
+  args:
+      executable: /bin/bash
+  become: true
+  changed_when: false
+  ignore_errors: yes
+
+- name: Initialize mysql instance
   shell: |
     set -o pipefail
     mysqld --initialize-insecure --user=mysql --basedir=/usr --datadir=/var/lib/mysql
@@ -10,7 +20,7 @@
   changed_when: false
   when: not (mysql_install_settings.use_mariadb | bool) and ansible_os_family == 'RedHat'
 
-- name: required mysql directories exist
+- name: Required mysql directories exist
   file:
     path: "{{ item }}"
     owner: mysql
@@ -22,48 +32,32 @@
   with_items:
     - "{{ mysql_dir_list }}"
 
-- name: standalone instance configuration files
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    mode: 0644
-    backup: yes
-  with_items:
-    - "{{ mysql_conf_templates }}"
-  when: not galera_cluster_settings.enabled | bool
+#- name: Fix config in /etc/mysql/mysql.conf.d/mysqld.cnf
+#  lineinfile:
+#    path: "/etc/mysql/mysql.conf.d/mysqld.cnf"
+#    state: absent
+#    regexp: "{{ item }}"
+#  with_items:
+#    - "(^datadir.*)"
+#    - "(^socket.*)"
+#    - "(^log-error.*)"
+#    - "(^pid-file.*)"
+#  when: ansible_os_family == 'Debian'
 
-- name: temporary mysql configuration
-  template:
-    src: "mysql/server/tmp_server.cnf.j2"
-    dest: "{{ mysql_server_cnf }}"
-    mode: 0644
-
-- name: fix config in /etc/mysql/mysql.conf.d/mysqld.cnf
-  lineinfile:
-    path: "/etc/mysql/mysql.conf.d/mysqld.cnf"
-    state: absent
-    regexp: "{{ item }}"
-  with_items:
-    - "(^datadir.*)"
-    - "(^socket.*)"
-    - "(^log-error.*)"
-    - "(^pid-file.*)"
-  when: ansible_os_family == 'Debian'
-
-- name: start mysql service
+- name: Start mysql service
   systemd:
     state: started
     name: "{{ mysql_service_daemon }}"
     enabled: yes
 
-- name: apparmor | reload apparmor profiles
+- name: Reload apparmor profiles
   command: "apparmor_parser -R {{ item }}"
   become: true
   with_items:
     - "/etc/apparmor.d/usr.sbin.mysqld"
   when: ansible_apparmor.status == 'enabled' and mysqld_apparmor_disabled['changed']
 
-- name: stop mysql before bootstrap
+- name: Stop mysql before bootstrap
   systemd:
     state: stopped
     name: "{{ mysql_service_daemon }}"

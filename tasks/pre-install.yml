@@ -1,6 +1,6 @@
 ---
 
-- name: os configuration files
+- name: OS configuration files
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -8,6 +8,11 @@
     force: yes
   loop: "{{ config_templates }}"
   register: config_files
+  notify:
+    - Reload sysctl
+
+- name: Flush handlers
+  meta: flush_handlers
 
 - name: Increase max open files for system/users
   lineinfile:
@@ -19,17 +24,7 @@
     - { name: "/etc/systemd/system.conf" }
     - { name: "/etc/systemd/user.conf" }
 
-- name: Reload sysctl
-  shell: |
-    set -o pipefail
-    sysctl -p /etc/sysctl.d/99-sysctl.conf
-  args:
-      executable: /bin/bash
-  become: true
-  changed_when: false
-  ignore_errors: yes
-
-- name: add noatime option for improved fs performance
+- name: Mount with noatime in /etc/fstab
   replace:
     backup: yes
     path: /etc/fstab

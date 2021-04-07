@@ -1,22 +1,11 @@
 ---
 
-- name: Create mysql client configuration file
+- name: Create client configuration file
   template:
     src: "mysql/client/mysql-client.cnf.j2"
     dest: "{{ ansible_user_dir }}/.my.cnf"
     mode: 0600
-  when: ansible_os_family == 'RedHat' and (mysql_install_settings.root_password|length > 0)
-
-- name: Enable mysql general logging
-  community.mysql.mysql_variables:
-    variable: "{{ item.name }}"
-    value: "{{ item.value }}"
-    login_unix_socket: "{{ mysql_conf_settings.socket }}"
-  with_items:
-    - { name: "general_log_file", value: "/var/log/mysql/queries.log" }
-    - { name: "log_output", value: "FILE" }
-    - { name: "general_log", value: 1 }
-  changed_when: False
+  when: ansible_os_family == 'RedHat' and (mysql_install_settings.root_password is defined and mysql_install_settings.root_password|length > 0)
 
 - name: Remove anonymous users
   community.mysql.mysql_query:
@@ -25,14 +14,14 @@
     query:
       - DELETE FROM mysql.user WHERE User=''
 
-- name: Disallow root login remotely
+- name: Disallow remote root login
   community.mysql.mysql_query:
     login_unix_socket: "{{ mysql_conf_settings.socket }}"
     login_db: mysql
     query:
       - DELETE FROM mysql.user WHERE User='root' AND Host NOT IN ('localhost', '127.0.0.1', '::1')
 
-- name: Remove test database and access to it
+- name: Remove test database
   community.mysql.mysql_query:
     login_unix_socket: "{{ mysql_conf_settings.socket }}"
     login_db: mysql
@@ -41,15 +30,15 @@
       - DELETE FROM mysql.db WHERE Db='test' OR Db='test\\_%'
   changed_when: False
 
-- name: set root password and flush privileges
+- name: Set Root password
   community.mysql.mysql_query:
     login_unix_socket: "{{ mysql_conf_settings.socket }}"
     login_db: mysql
     query:
       - ALTER USER 'root'@'localhost' IDENTIFIED BY '{{ mysql_install_settings.root_password }}'; FLUSH PRIVILEGES;
-  when: mysql_install_settings.root_password|length > 0
+  when: mysql_install_settings.root_password is defined and mysql_install_settings.root_password|length > 0
 
-- name: selinux - change mysql port to {{ mysql_conf_settings.port }}
+- name: Change MySQL port to {{ mysql_conf_settings.port }}
   seport:
     ports: "{{ mysql_conf_settings.port }}"
     proto: tcp

@@ -1,10 +1,9 @@
 ---
 
-- name: cluster state snapshot transfer user
+- name: Add state snapshot transfer user
   community.mysql.mysql_user:
     name: "{{ galera_cluster_settings.wsrep_sst_user }}"
     password: "{{ galera_cluster_settings.wsrep_sst_pass }}"
-#    plugin: "unix_socket"
     host: localhost
     priv: '*.*:RELOAD,PROCESS,LOCK TABLES,REPLICATION CLIENT'
     state: present
@@ -12,7 +11,7 @@
   changed_when: False
   when: not 'rsync' in galera_cluster_settings.wsrep_sst_method and (galera_cluster_settings.wsrep_sst_user is defined)
 
-- name: cluster server configuration files
+- name: Cluster server configuration files
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
@@ -21,12 +20,12 @@
   with_items:
     - "{{ mysql_conf_templates }}"
   notify:
-    - stop mysql before bootstrap
+    - Stop mysql before bootstrap
 
 - name: Flush handlers
   meta: flush_handlers
 
-- name: cluster bootstrap fix
+- name: Cluster bootstrap fix
   file:
     path: /var/log/mysql/mysql.log
     owner: mysql
@@ -35,7 +34,7 @@
     mode: '0755'
   changed_when: false
 
-- name: cluster master bootstrap
+- name: Cluster master bootstrap
   shell: |
     set -o pipefail
     {{ cluster_bootstrap_cmd }}

@@ -1,15 +1,35 @@
 ---
 
-- name: install mysql packages
+- name: Install MySQL packages
   action: >
     {{ ansible_pkg_mgr }} name={{ mysql_package_list }} state=present update_cache=yes
   notify:
-    - initialize mysql instance
-    - required mysql directories exist
-    - standalone instance configuration files
-    - temporary mysql configuration
-    - fix config in /etc/mysql/mysql.conf.d/mysqld.cnf
-    - start mysql service
+    - Initialize mysql instance
+    - Required mysql directories exist
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Standalone instance configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    backup: yes
+  with_items:
+    - "{{ mysql_conf_templates }}"
+  when: not galera_cluster_settings.enabled | bool
+  notify:
+    - Start mysql service
+
+- name: Alternate instance configuration files
+  template:
+    src: "mysql/server/tmp_server.cnf.j2"
+    dest: "{{ mysql_server_cnf }}"
+    mode: 0644
+  when: galera_cluster_settings.enabled | bool
+  notify:
+    - Start mysql service
 
 - name: Flush handlers
   meta: flush_handlers
@@ -23,3 +43,4 @@
     state: started
     msg: "Node is now accepting mysql connections"
   connection: local
+  when: galera_cluster_settings.enabled | bool
