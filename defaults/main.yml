@@ -49,11 +49,3 @@ mysql_conf_settings:
   innodb_thread_concurrency: 0
   innodb_stats_on_metadata: "OFF"
   innodb_buffer_pool_instances: 1
-
-galera_cluster_settings:
-  enabled: false
-  wsrep_sst_method: "mariabackup"
-  wsrep_sst_user: "cluster_sstuser"
-  wsrep_sst_pass: "tstwytw22211"
-  wsrep_provider_options: "gcache.recover=yes; gcache.size=128M; gcache.page_size=128M"
-  wsrep_cluster_name: "GaleraCluster"

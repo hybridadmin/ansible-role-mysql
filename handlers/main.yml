@@ -32,6 +32,24 @@
   with_items:
     - "{{ mysql_dir_list }}"
 
+- name: Standalone instance configuration files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    backup: yes
+  with_items:
+    - "{{ mysql_conf_templates }}"
+  when: not galera_cluster_settings.enabled | bool
+
+- name: Alternate instance configuration files
+  template:
+    src: "mysql/server/tmp_server.cnf.j2"
+    dest: "{{ mysql_server_cnf }}"
+    mode: 0644
+  when: galera_cluster_settings.enabled | bool
+#  changed_when: false
+
 #- name: Fix config in /etc/mysql/mysql.conf.d/mysqld.cnf
 #  lineinfile:
 #    path: "/etc/mysql/mysql.conf.d/mysqld.cnf"

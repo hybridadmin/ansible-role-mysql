@@ -19,6 +19,7 @@
     backup: yes
   with_items:
     - "{{ mysql_conf_templates }}"
+#  changed_when: false
   notify:
     - Stop mysql before bootstrap
 
@@ -50,7 +51,7 @@
     host: "localhost"
     port: "3306"
     delay: 5
-    timeout: 300
+    timeout: 180
     state: started
     msg: "Node is now accepting mysql connections"
   connection: local

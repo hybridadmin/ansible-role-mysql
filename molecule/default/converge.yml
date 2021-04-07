@@ -1,6 +1,20 @@
 ---
 - name: Converge
   hosts: all
+  vars:
+    mysql_install_settings:
+      use_mariadb: true
+      version: 10.5
+      root_password: ''
+
+    galera_cluster_settings:
+      enabled: true
+      wsrep_sst_method: "mariabackup"
+      wsrep_sst_user: "cluster_sstuser"
+      wsrep_sst_pass: "tstwytw22211"
+      wsrep_provider_options: "gcache.recover=yes; gcache.size=128M; gcache.page_size=128M"
+      wsrep_cluster_name: "GaleraCluster"
+
   tasks:
 
     - name: set ansible_python_interpreter

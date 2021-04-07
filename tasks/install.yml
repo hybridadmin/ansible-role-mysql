@@ -6,33 +6,37 @@
   notify:
     - Initialize mysql instance
     - Required mysql directories exist
-
-- name: Flush handlers
-  meta: flush_handlers
-
-- name: Standalone instance configuration files
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-    mode: 0644
-    backup: yes
-  with_items:
-    - "{{ mysql_conf_templates }}"
-  when: not galera_cluster_settings.enabled | bool
-  notify:
-    - Start mysql service
-
-- name: Alternate instance configuration files
-  template:
-    src: "mysql/server/tmp_server.cnf.j2"
-    dest: "{{ mysql_server_cnf }}"
-    mode: 0644
-  when: galera_cluster_settings.enabled | bool
-  notify:
+    - Standalone instance configuration files
+    - Alternate instance configuration files
     - Start mysql service
 
 - name: Flush handlers
   meta: flush_handlers
+
+#- name: Standalone instance configuration files
+#  template:
+#    src: "{{ item.src }}"
+#    dest: "{{ item.dest }}"
+#    mode: 0644
+#    backup: yes
+#  with_items:
+#    - "{{ mysql_conf_templates }}"
+#  when: not galera_cluster_settings.enabled | bool
+#  notify:
+#    - Start mysql service
+
+#- name: Alternate instance configuration files
+#  template:
+#    src: "mysql/server/tmp_server.cnf.j2"
+#    dest: "{{ mysql_server_cnf }}"
+#    mode: 0644
+#  when: galera_cluster_settings.enabled | bool
+##  changed_when: false
+#  notify:
+#    - Start mysql service
+
+#- name: Flush handlers
+#  meta: flush_handlers
 
 - name: Check node is accepting mysql connections
   wait_for:
