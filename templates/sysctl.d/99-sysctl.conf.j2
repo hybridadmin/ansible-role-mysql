@@ -3,7 +3,7 @@
 # with inspiration from: https://www.cyberciti.biz/faq/linux-tcp-tuning/
 vm.swappiness=0
 
-{% if ansible_kernel.split('-')[0] is version('4.8', operator='gt', strict=True) %}
+{% if (ansible_kernel.split('.')[0:3] | join('.')) is version('4.8', operator='gt', strict=True) %}
 # Fix it on Linux by enabling BBR TCP congestion control.
 {% if not ansible_virtualization_type | regex_search("docker|container") %}
 net.core.default_qdisc=fq
