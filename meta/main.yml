@@ -23,7 +23,7 @@ galaxy_info:
        - 32
    - name: debian
      versions:
-       - 10
+       - buster
 
   galaxy_tags:
     - mysql
