@@ -12,15 +12,14 @@ galaxy_info:
      versions:
        - focal
        - bionic
-       - xenial
    - name: EL
      versions:
        - 8
        - 7
    - name: Fedora
      versions:
+       - 34
        - 33
-       - 32
    - name: debian
      versions:
        - buster
