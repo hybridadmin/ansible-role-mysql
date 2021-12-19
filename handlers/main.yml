@@ -8,7 +8,8 @@
       executable: /bin/bash
   become: true
   changed_when: false
-  ignore_errors: yes
+  register: sysctl_cmd
+  failed_when: sysctl_cmd.rc >= 1
 
 - name: Initialize mysql instance
   shell: |

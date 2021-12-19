@@ -43,7 +43,8 @@
     creates: "/var/lib/mysql/grastate.dat"
   become: true
   changed_when: false
-  ignore_errors: yes
+  register: bootstrap_cmd
+  failed_when: bootstrap_cmd.rc >= 1
 
 - name: Cluster - Check node is accepting mysql connections
   wait_for:

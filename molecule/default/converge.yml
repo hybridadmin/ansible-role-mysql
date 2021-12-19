@@ -4,7 +4,7 @@
   vars:
     mysql_install_settings:
       use_mariadb: true
-      version: 10.5
+      version: 10.6
       root_password: ''
 
     galera_cluster_settings:
