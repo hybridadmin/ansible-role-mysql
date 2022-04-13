@@ -58,9 +58,9 @@ jobs:
           - image: debian
             tag: 10
           - image: fedora
-            tag: 34
+            tag: 35
           - image: fedora
-            tag: 33
+            tag: 34
     env:
       ANSIBLE_CALLBACK_WHITELIST: profile_tasks
       ANSIBLE_STDOUT_CALLBACK: yaml

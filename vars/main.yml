@@ -1,6 +1,12 @@
 ---
 
 # package configuration
+_pip_packages:
+  default:
+    - PyMySQL
+
+pip_packages: "{{ _pip_packages['default'] }}"
+
 _basic_system_packages:
   default:
     - gnupg2

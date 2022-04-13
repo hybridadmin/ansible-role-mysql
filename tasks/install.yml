@@ -13,6 +13,12 @@
 - name: Flush handlers
   meta: flush_handlers
 
+- name: Install pip packages
+  pip:
+    name: "{{ pip_packages }}"
+    executable: pip3
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == "7"
+
 - name: Check node is accepting mysql connections
   wait_for:
     host: "localhost"
