@@ -14,11 +14,9 @@
   meta: flush_handlers
 
 - name: Install pip packages
-#  pip:
-#    name: "{{ pip_packages }}"
   shell: |
     set -o pipefail
-    python -m pip install --upgrade --force-reinstall {{ pip_packages | join( ' ') }}
+    pip install {{ pip_packages | join( ' ') }}
   args:
     executable: /bin/bash
   changed_when: false
