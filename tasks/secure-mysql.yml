@@ -7,6 +7,11 @@
     mode: 0600
   when: ansible_os_family == 'RedHat' and (mysql_install_settings.root_password is defined and mysql_install_settings.root_password|length > 0)
 
+- name: set python version
+  set_fact:
+    ansible_python_interpreter: "/usr/bin/python3"
+  when: ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
+
 - name: Remove anonymous users
   community.mysql.mysql_query:
     login_unix_socket: "{{ mysql_conf_settings.socket }}"
