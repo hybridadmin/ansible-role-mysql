@@ -14,7 +14,7 @@
       wsrep_sst_user: "cluster_sstuser"
       wsrep_sst_pass: "2rZXRAwl28Vy"
       wsrep_provider_options: "gcache.recover=yes; gcache.size=128M; gcache.page_size=128M"
-      wsrep_cluster_name: "GaleraCluster"
+      wsrep_cluster_name: "galera_cluster"
 
   tasks:
 
