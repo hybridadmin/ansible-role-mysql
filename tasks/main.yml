@@ -1,14 +1,20 @@
 ---
 
-- include: repo-setup.yml
+- name: repo tasks
+  include_tasks: repo-setup.yml
 
-- include: pre-install.yml
+- name: pre-install tasks
+  include_tasks: pre-install.yml
 
-- include: install.yml
+- name: install tasks
+  include_tasks: install.yml
 
-- include: configure.yml
+- name: configure tasks
+  include_tasks: configure.yml
 
-- include: secure-mysql.yml
+- name: secure tasks
+  include_tasks: secure-mysql.yml
 
-- include: galera.yml
+- name: galera tasks
+  include_tasks: galera.yml
   when: (galera_cluster_settings.enabled | bool)

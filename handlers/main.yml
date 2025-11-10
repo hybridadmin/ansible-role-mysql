@@ -75,6 +75,7 @@
   with_items:
     - "/etc/apparmor.d/usr.sbin.mysqld"
   when: ansible_apparmor.status == 'enabled' and mysqld_apparmor_disabled['changed']
+  changed_when: false
 
 - name: Stop mysql before bootstrap
   systemd:
