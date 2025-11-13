@@ -21,6 +21,9 @@ _basic_system_packages:
   RedHat:
     - procps-ng
     - iproute
+  Fedora:
+    - procps-ng
+    - iproute
 
 basic_system_packages: "{{ _basic_system_packages['default'] + _basic_system_packages[ansible_distribution] }}"
 
