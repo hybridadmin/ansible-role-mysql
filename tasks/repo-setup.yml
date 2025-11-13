@@ -17,12 +17,18 @@
     path: /etc/apt/keyrings
     state: directory
     mode: '0755'
+  when: ansible_os_family == 'Debian'
 
 - name: Import Debian GPG key
   ansible.builtin.get_url:
     url: "https://mariadb.org/mariadb_release_signing_key.pgp"
     dest: "/etc/apt/keyrings/mariadb-keyring.pgp"
     mode: '0644'
+  when: ansible_os_family == 'Debian'
+
+- name: Debian update APT cache
+  ansible.builtin.apt:
+    update_cache: yes
   when: ansible_os_family == 'Debian'
 
 #  apt_key:
@@ -44,12 +50,13 @@
 #  with_items:
 #    - "{{ rpm_gpg_key_info }}"
 
-- name: Disable mysql mariadb modules
-  shell: |
-    set -o pipefail
-    dnf module disable mysql mariadb -qy
-  args:
-      executable: /bin/bash
-  become: true
-  changed_when: false
-  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version| int >= 8
+# TODO: do we still need this for RHEL distros ?
+#- name: Disable mysql mariadb modules
+#  shell: |
+#    set -o pipefail
+#    dnf module disable mysql mariadb -qy
+#  args:
+#      executable: /bin/bash
+#  become: true
+#  changed_when: false
+#  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version| int >= 8

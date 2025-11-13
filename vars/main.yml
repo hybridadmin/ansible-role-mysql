@@ -13,13 +13,16 @@ _basic_system_packages:
     - curl
     - rsync
   Debian:
+#    - software-properties-common
+    - procps
+  Ubuntu:
     - software-properties-common
     - procps
   RedHat:
     - procps-ng
     - iproute
 
-basic_system_packages: "{{ _basic_system_packages['default'] + _basic_system_packages[ansible_os_family] }}"
+basic_system_packages: "{{ _basic_system_packages['default'] + _basic_system_packages[ansible_distribution] }}"
 
 mysql_server_type: "{% if mysql_install_settings.use_mariadb | bool %}mariadb{% else %}mysql{% endif %}"
 galera_version: "{% if mysql_install_settings.version is version('5.7', '>=') %}4{% else %}3{% endif %}"

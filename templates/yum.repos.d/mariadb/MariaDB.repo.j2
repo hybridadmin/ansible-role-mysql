@@ -1,7 +1,7 @@
 # https://mariadb.org/download/
 [mariadb]
 name = MariaDB
-# baseurl = https://rpm.mariadb.org/{{ mysql_install_settings.version }}/fedora/$releasever/$basearch
+# baseurl = https://rpm.mariadb.org/{{ mysql_install_settings.version }}/{{ ansible_distribution|lower }}/$releasever/$basearch
 baseurl = https://mariadb.mirror.liquidtelecom.com/yum/{{ mysql_install_settings.version }}/{{ ansible_distribution|lower }}/$releasever/$basearch
 # gpgkey= https://rpm.mariadb.org/RPM-GPG-KEY-MariaDB
 gpgkey=https://mariadb.mirror.liquidtelecom.com/yum/RPM-GPG-KEY-MariaDB
