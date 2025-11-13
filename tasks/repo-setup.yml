@@ -12,25 +12,37 @@
   with_items:
     - "{{ mysql_repo_file_info }}"
 
-- name: Import Debian GPG key
-  apt_key:
-    keyserver: "{{ item.server }}"
-    id: "{{ item.fingerprint }}"
-  when: ansible_os_family == 'Debian'
-  with_items: "{{ apt_gpg_key_info }}"
+- name: Create GPG key dir
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
 
-- name: Import Redhat GPG key
-  shell: |
-    set -o pipefail
-    curl -fsSL {{ item.url }} -o {{ item.dest }}
-    rpm --import {{ item.dest }}
-  args:
-      executable: /bin/bash
-  become: true
-  changed_when: false
-  when: ansible_os_family == 'RedHat'
-  with_items:
-    - "{{ rpm_gpg_key_info }}"
+- name: Import Debian GPG key
+  ansible.builtin.get_url:
+    url: "https://mariadb.org/mariadb_release_signing_key.pgp"
+    dest: "/etc/apt/keyrings/mariadb-keyring.pgp"
+    mode: '0644'
+  when: ansible_os_family == 'Debian'
+
+#  apt_key:
+#    keyserver: "{{ item.server }}"
+#    id: "{{ item.fingerprint }}"
+#  when: ansible_os_family == 'Debian'
+#  with_items: "{{ apt_gpg_key_info }}"
+
+#- name: Import Redhat GPG key
+#  shell: |
+#    set -o pipefail
+#    curl -fsSL {{ item.url }} -o {{ item.dest }}
+#    rpm --import {{ item.dest }}
+#  args:
+#      executable: /bin/bash
+#  become: true
+#  changed_when: false
+#  when: ansible_os_family == 'RedHat'
+#  with_items:
+#    - "{{ rpm_gpg_key_info }}"
 
 - name: Disable mysql mariadb modules
   shell: |

@@ -105,7 +105,7 @@ mysql_socket_file: "{% if mysql_install_settings.use_mariadb | bool %}{{ _mariad
 _mysql_repo_file_mapping:
   Debian:
     mariadb:
-      - { source: "sources.list.d/mariadb/MariaDB.list.j2", dest: "/etc/apt/sources.list.d/MariaDB.list" }
+      - { source: "sources.list.d/mariadb/mariadb.sources.j2", dest: "/etc/apt/sources.list.d/mariadb.sources" }
     mysql:
       - { source: "sources.list.d/mysql/mysql.list.j2", dest: "/etc/apt/sources.list.d/mysql.list" }
     mysql_galera:

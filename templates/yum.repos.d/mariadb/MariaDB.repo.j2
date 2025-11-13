@@ -1,8 +1,8 @@
+# https://mariadb.org/download/
 [mariadb]
-name = MariaDB-{{ mysql_install_settings.version }}
-baseurl=http://yum.mariadb.org/{{ mysql_install_settings.version }}/{{ ansible_distribution | lower }}{{ ansible_distribution_major_version }}-amd64
-{% if 'dnf' in ansible_pkg_mgr %}
-module_hotfixes=1
-{% endif %}
-gpgkey=https://yum.mariadb.org/RPM-GPG-KEY-MariaDB
+name = MariaDB
+# baseurl = https://rpm.mariadb.org/{{ mysql_install_settings.version }}/fedora/$releasever/$basearch
+baseurl = https://mariadb.mirror.liquidtelecom.com/yum/{{ mysql_install_settings.version }}/{{ ansible_distribution|lower }}/$releasever/$basearch
+# gpgkey= https://rpm.mariadb.org/RPM-GPG-KEY-MariaDB
+gpgkey=https://mariadb.mirror.liquidtelecom.com/yum/RPM-GPG-KEY-MariaDB
 gpgcheck=1

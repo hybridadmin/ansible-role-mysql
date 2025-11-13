@@ -1,0 +1,9 @@
+# https://mariadb.org/download/
+X-Repolib-Name: MariaDB
+Types: deb
+# deb.mariadb.org is a dynamic mirror if your preferred mirror goes offline. See https://mariadb.org/mirrorbits/ for details.
+# URIs: https://deb.mariadb.org/{{ mysql_install_settings.version }}/{{ ansible_distribution|lower }}
+URIs: https://mariadb.mirror.liquidtelecom.com/repo/{{ mysql_install_settings.version }}/{{ ansible_distribution|lower }}
+Suites: {{ ansible_distribution_release }}
+Components: main {% if ansible_distribution|lower == 'ubuntu' %}main/debug{% endif %}
+Signed-By: /etc/apt/keyrings/mariadb-keyring.pgp

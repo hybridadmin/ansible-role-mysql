@@ -19,8 +19,6 @@ jobs:
             tag: noble
           - image: ubuntu
             tag: jammy
-          - image: ubuntu
-            tag: focal
           - image: debian
             tag: 13
           - image: debian
