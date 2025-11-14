@@ -28,8 +28,8 @@
     line: DefaultLimitNOFILE=256000:1000000
     state: present
   loop:
-    - { name: "/etc/systemd/system.conf" }
-    - { name: "/etc/systemd/user.conf" }
+    - { name: "{{ system_config_dir }}/system.conf" }
+    - { name: "{{ system_config_dir }}/user.conf" }
 
 - name: Mount with noatime in /etc/fstab
   replace:

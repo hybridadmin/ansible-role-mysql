@@ -5,5 +5,9 @@ Types: deb
 # URIs: https://deb.mariadb.org/{{ mysql_install_settings.version }}/{{ ansible_distribution|lower }}
 URIs: https://mariadb.mirror.liquidtelecom.com/repo/{{ mysql_install_settings.version }}/{{ ansible_distribution|lower }}
 Suites: {{ ansible_distribution_release }}
-Components: main {% if ansible_distribution|lower == 'ubuntu' %}main/debug{% endif %}
+{% if ansible_distribution|lower == 'ubuntu' %}
+Components: main main/debug
+{% else %}
+Components: main
+{% endif %}
 Signed-By: /etc/apt/keyrings/mariadb-keyring.pgp

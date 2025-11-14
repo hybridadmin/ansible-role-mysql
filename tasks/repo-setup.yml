@@ -4,13 +4,23 @@
   action: >
       {{ ansible_pkg_mgr }} name={{ basic_system_packages }} state=present update_cache=yes
 
+- name: Debian minimum mariadb version 12.0
+  set_fact:
+    mysql_install_settings:
+      version: 12.0
+      use_mariadb: true
+      root_password: ''
+  when:
+    - mysql_install_settings.use_mariadb|bool
+    - ansible_distribution|lower == 'debian' and ansible_distribution_release == 'trixie'
+
 - name: Create repository configuration file
   template:
     src: "{{ item.source }}"
     dest: "{{ item.dest }}"
     mode: '0644'
   with_items:
-    - "{{ mysql_repo_file_info }}"
+    - "{{ mysql_repo_file_mapping }}"
 
 - name: Create GPG key dir
   ansible.builtin.file:

@@ -13,7 +13,6 @@ _basic_system_packages:
     - curl
     - rsync
   Debian:
-#    - software-properties-common
     - procps
   Ubuntu:
     - software-properties-common
@@ -26,6 +25,16 @@ _basic_system_packages:
     - iproute
 
 basic_system_packages: "{{ _basic_system_packages['default'] + _basic_system_packages[ansible_distribution] }}"
+
+_system_config_dir:
+  Alpine: "/etc/systemd"
+  Debian: "/etc/systemd"
+  Ubuntu: "/etc/systemd"
+  Fedora: "/usr/lib/systemd"
+  CentOS: "/usr/lib/systemd"
+  Suse: "/etc/systemd"
+
+system_config_dir: "{{ _system_config_dir[ansible_distribution] }}"
 
 mysql_server_type: "{% if mysql_install_settings.use_mariadb | bool %}mariadb{% else %}mysql{% endif %}"
 galera_version: "{% if mysql_install_settings.version is version('5.7', '>=') %}4{% else %}3{% endif %}"
@@ -44,26 +53,26 @@ _mysql_package_list:
       - mysql-wsrep-{{ mysql_install_settings.version }}
   RedHat:
     mariadb:
-      - MariaDB-server
-      - MariaDB-client
-      - MariaDB-shared
-      - MariaDB-common
+      - mariadb-server
+      - mariadb-common
     mysql:
       - mysql-community-server
     mysql_galera:
       - galera-{{ galera_version }}
       - mysql-wsrep-{{ mysql_install_settings.version }}
 
-mysql_package_list: |
-     {% if galera_cluster_settings.enabled | bool %}
-     {% if mysql_install_settings.use_mariadb | bool %}
-     {{ _mysql_package_list[ansible_os_family][mysql_server_type] }}
-     {% else %}
-     {{ _mysql_package_list[ansible_os_family]['mysql_galera'] }}
-     {% endif %}
-     {% else %}
-     {{ _mysql_package_list[ansible_os_family][mysql_server_type] }}
-     {% endif%}
+mysql_package_list: "{{ _mysql_package_list[ansible_os_family][mysql_server_type] }}"
+
+#mysql_package_list: |
+#     {% if galera_cluster_settings.enabled | bool %}
+#     {% if mysql_install_settings.use_mariadb | bool %}
+#     {{ _mysql_package_list[ansible_os_family][mysql_server_type] }}
+#     {% else %}
+#     {{ _mysql_package_list[ansible_os_family]['mysql_galera'] }}
+#     {% endif %}
+#     {% else %}
+#     {{ _mysql_package_list[ansible_os_family][mysql_server_type] }}
+#     {% endif%}
 
 _mysql_conf:
   Debian:
@@ -114,27 +123,23 @@ _mysql_repo_file_mapping:
       - { source: "sources.list.d/mariadb/mariadb.sources.j2", dest: "/etc/apt/sources.list.d/mariadb.sources" }
     mysql:
       - { source: "sources.list.d/mysql/mysql.list.j2", dest: "/etc/apt/sources.list.d/mysql.list" }
-    mysql_galera:
-      - { source: "sources.list.d/galera/galera.list.j2", dest: "/etc/apt/sources.list.d/galera.list" }
-      - { source: "preferences.d/galera/galera.j2", dest: "/etc/apt/preferences.d/galera" }
   RedHat:
     mariadb:
       - { source: "yum.repos.d/mariadb/MariaDB.repo.j2", dest: "/etc/yum.repos.d/MariaDB.repo" }
     mysql:
       - { source: "yum.repos.d/mysql/mysql-community.repo.j2", dest: "/etc/yum.repos.d/mysql-community.repo" }
+
+mysql_repo_file_mapping: "{{ _mysql_repo_file_mapping[ansible_os_family][mysql_server_type] }}"
+
+_galera_file_mapping:
+  Debian:
+      - { source: "sources.list.d/galera/galera.list.j2", dest: "/etc/apt/sources.list.d/galera.list" }
+      - { source: "preferences.d/galera/galera.j2", dest: "/etc/apt/preferences.d/galera" }
+  RedHat:
     mysql_galera:
       - { source: "yum.repos.d/galera/Galera.repo.j2", dest: "/etc/yum.repos.d/Galera.repo" }
 
-mysql_repo_file_info: |
-     {% if galera_cluster_settings.enabled | bool %}
-     {% if mysql_install_settings.use_mariadb | bool %}
-     {{ _mysql_repo_file_mapping[ansible_os_family][mysql_server_type] }}
-     {% else %}
-     {{ _mysql_repo_file_mapping[ansible_os_family]['mysql_galera'] }}
-     {% endif %}
-     {% else %}
-     {{ _mysql_repo_file_mapping[ansible_os_family][mysql_server_type] }}
-     {% endif%}
+galera_file_mapping: "{{ _galera_file_mapping[ansible_os_family] }}"
 
 _rpm_gpg_key_info:
   mariadb:
