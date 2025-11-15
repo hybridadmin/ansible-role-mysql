@@ -1,26 +1,22 @@
 ---
+
 - name: Converge
   hosts: all
   vars:
     mysql_install_settings:
       use_mariadb: true
-      version: 10.6
+      version: 10.11
       root_password: ''
 
     galera_cluster_settings:
       enabled: false
       wsrep_sst_method: "mariabackup"
       wsrep_sst_user: "cluster_sstuser"
-      wsrep_sst_pass: "tstwytw22211"
+      wsrep_sst_pass: "2rZXRAwl28Vy"
       wsrep_provider_options: "gcache.recover=yes; gcache.size=128M; gcache.page_size=128M"
-      wsrep_cluster_name: "GaleraCluster"
+      wsrep_cluster_name: "galera_cluster"
 
   tasks:
-
-    - name: set ansible_python_interpreter
-      set_fact:
-        ansible_python_interpreter: "/usr/bin/python"
-      when: ansible_distribution_release == 'xenial' or (ansible_distribution == 'CentOS' and ansible_distribution_major_version| int <= 7)
 
     - name: "Include hybridadmin.mysql"
       include_role:

@@ -4,40 +4,70 @@
   action: >
       {{ ansible_pkg_mgr }} name={{ basic_system_packages }} state=present update_cache=yes
 
+- name: Debian minimum mariadb version 12.0
+  set_fact:
+    mysql_install_settings:
+      version: 12.0
+      use_mariadb: true
+      root_password: ''
+  when:
+    - mysql_install_settings.use_mariadb|bool
+    - ansible_distribution|lower == 'debian' and ansible_distribution_release == 'trixie'
+
 - name: Create repository configuration file
   template:
     src: "{{ item.source }}"
     dest: "{{ item.dest }}"
     mode: '0644'
   with_items:
-    - "{{ mysql_repo_file_info }}"
+    - "{{ mysql_repo_file_mapping }}"
+
+- name: Create GPG key dir
+  ansible.builtin.file:
+    path: /etc/apt/keyrings
+    state: directory
+    mode: '0755'
+  when: ansible_os_family == 'Debian'
 
 - name: Import Debian GPG key
-  apt_key:
-    keyserver: "{{ item.server }}"
-    id: "{{ item.fingerprint }}"
+  ansible.builtin.get_url:
+    url: "https://mariadb.org/mariadb_release_signing_key.pgp"
+    dest: "/etc/apt/keyrings/mariadb-keyring.pgp"
+    mode: '0644'
   when: ansible_os_family == 'Debian'
-  with_items: "{{ apt_gpg_key_info }}"
 
-- name: Import Redhat GPG key
-  shell: |
-    set -o pipefail
-    curl -fsSL {{ item.url }} -o {{ item.dest }}
-    rpm --import {{ item.dest }}
-  args:
-      executable: /bin/bash
-  become: true
-  changed_when: false
-  when: ansible_os_family == 'RedHat'
-  with_items:
-    - "{{ rpm_gpg_key_info }}"
+- name: Debian update APT cache
+  ansible.builtin.apt:
+    update_cache: yes
+    cache_valid_time: 3600
+  when: ansible_os_family == 'Debian'
 
-- name: Disable mysql mariadb modules
-  shell: |
-    set -o pipefail
-    dnf module disable mysql mariadb -qy
-  args:
-      executable: /bin/bash
-  become: true
-  changed_when: false
-  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version| int >= 8
+#  apt_key:
+#    keyserver: "{{ item.server }}"
+#    id: "{{ item.fingerprint }}"
+#  when: ansible_os_family == 'Debian'
+#  with_items: "{{ apt_gpg_key_info }}"
+
+#- name: Import Redhat GPG key
+#  shell: |
+#    set -o pipefail
+#    curl -fsSL {{ item.url }} -o {{ item.dest }}
+#    rpm --import {{ item.dest }}
+#  args:
+#      executable: /bin/bash
+#  become: true
+#  changed_when: false
+#  when: ansible_os_family == 'RedHat'
+#  with_items:
+#    - "{{ rpm_gpg_key_info }}"
+
+# TODO: do we still need this for RHEL distros ?
+#- name: Disable mysql mariadb modules
+#  shell: |
+#    set -o pipefail
+#    dnf module disable mysql mariadb -qy
+#  args:
+#      executable: /bin/bash
+#  become: true
+#  changed_when: false
+#  when: ansible_os_family == 'RedHat' and ansible_distribution_major_version| int >= 8
