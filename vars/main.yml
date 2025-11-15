@@ -63,6 +63,9 @@ _mysql_package_list:
 
 mysql_package_list: "{{ _mysql_package_list[ansible_os_family][mysql_server_type] }}"
 
+galera_package_list:
+  - galera-4
+
 #mysql_package_list: |
 #     {% if galera_cluster_settings.enabled | bool %}
 #     {% if mysql_install_settings.use_mariadb | bool %}
@@ -141,24 +144,24 @@ _galera_file_mapping:
 
 galera_file_mapping: "{{ _galera_file_mapping[ansible_os_family] }}"
 
-_rpm_gpg_key_info:
-  mariadb:
-    - { url: "https://yum.mariadb.org/RPM-GPG-KEY-MariaDB", dest: "/tmp/RPM-GPG-KEY-MariaDB" }
-  mysql:
-    - { url: "https://repo.mysql.com/RPM-GPG-KEY-mysql", dest: "/tmp/RPM-GPG-KEY-mysql"}
-  mysql_galera:
-    - { url: "https://releases.galeracluster.com/GPG-KEY-galeracluster.com", dest: "/tmp/GPG-KEY-galeracluster.com" }
+#_rpm_gpg_key_info:
+#  mariadb:
+#    - { url: "https://yum.mariadb.org/RPM-GPG-KEY-MariaDB", dest: "/tmp/RPM-GPG-KEY-MariaDB" }
+#  mysql:
+#    - { url: "https://repo.mysql.com/RPM-GPG-KEY-mysql", dest: "/tmp/RPM-GPG-KEY-mysql"}
+#  mysql_galera:
+#    - { url: "https://releases.galeracluster.com/GPG-KEY-galeracluster.com", dest: "/tmp/GPG-KEY-galeracluster.com" }
 
-rpm_gpg_key_info: |
-     {% if galera_cluster_settings.enabled | bool %}
-     {% if mysql_install_settings.use_mariadb | bool %}
-     {{ _rpm_gpg_key_info[mysql_server_type] }}
-     {% else %}
-     {{ _rpm_gpg_key_info['mysql_galera'] }}
-     {% endif %}
-     {% else %}
-     {{ _rpm_gpg_key_info[mysql_server_type] }}
-     {% endif%}
+#rpm_gpg_key_info: |
+#     {% if galera_cluster_settings.enabled | bool %}
+#     {% if mysql_install_settings.use_mariadb | bool %}
+#     {{ _rpm_gpg_key_info[mysql_server_type] }}
+#     {% else %}
+#     {{ _rpm_gpg_key_info['mysql_galera'] }}
+#     {% endif %}
+#     {% else %}
+#     {{ _rpm_gpg_key_info[mysql_server_type] }}
+#     {% endif%}
 
 # https://dev.mysql.com/doc/refman/8.0/en/checking-gpg-signature.html
 # keys.gnupg.net
